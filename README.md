@@ -26,8 +26,8 @@ Lambdas
 Lambdas are the only way to define a function or method:
 
 ```
-fibonacci -> n int -> int
-  subFib -> a int -> b int -> n int-> int
+func fibonacci -> n int -> int
+  func subFib -> a int -> b int -> n int-> int
     match n
       0,1,2 -> a
       n     -> subFib a+b a n-1
@@ -35,7 +35,7 @@ fibonacci -> n int -> int
 ```  
 
   This example actually demonstrates a few things:
-  + Lambdas (`->` syntax)
+  + Lambdas (`func` + `->` syntax)
   + Pattern Matching (`match` keyword)
   + Tabs over brackets
   + Lack of `return` keyword
@@ -52,7 +52,7 @@ Generics
 Generics are not defined explicitly, but by leaving type information out for the compiler to determine:
 
 ```
-double -> a' -> a'
+func double -> a' -> a'
   a + a
   
 double 2 // Results in 4
@@ -61,7 +61,7 @@ double 2 // Results in 4
 The only requirement is that whatever type `a` turns out to be, has the `+` operator. Also notice the types: `a'` (pronouced A-Prime). This is how a generic type is denoted.  So say there are two parameters:
 
 ```
-encode -> a' -> b' -> b`
+func encode -> a' -> b' -> b`
   a.encode b
 ```  
 
@@ -73,7 +73,7 @@ Pattern Matching
 Pattern matching is nothing more than a fancy `switch` statement, however most would argue that the syntax is much cleaner.  The way it works is by defining several `lambdas` with the desired value that result in that lambda being called:
 
 ```
-randomName -> n int -> string
+func randomName -> n int -> string
   match randomName
     0 -> "Bill" // Called if n is 0
     9 -> "Sandy" // Called if n is 9
@@ -94,12 +94,31 @@ Higher order functions
 Functions can take functions as a parameter:
 
 ```
-funcA -> a int -> funcB -> b int -> int -> int
+func funcA -> a int -> func funcB -> b int -> int -> int
   funcB a
 ```
 
 This example demonstrates a function (`funcA`) that takes an `int` and a function (`funcB`) and returns an `int`. `funcB` takes an `int` and returns an `int`.
 
+Functions can return a function:
+
+```
+func addTo -> a int -> func -> int -> int
+  func -> b int -> int
+    a + b
+```
+
+This example demonstrates anonymous functions and that the last entry is returned from the function.
+
+Functions can be partially called:
+
+```
+func add -> a int -> b int-> int
+  a + b
+  
+x = add 1 // x is now a func -> a int -> int
+y = x 2 // y is now 3
+```
 
 Operator overloading
 ====================
