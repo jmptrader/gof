@@ -40,24 +40,28 @@ fibonacci -> n int -> int
   + Tabs over brackets
   + Lack of `return` keyword
   + Tail Recursion
-   
   
+  Important requirements of a Lambda:
+  + First token is the name of the lambda. (Use `_` if the name isn't used)
+  + Last token is the return type. (Use `unit` if there isn't one)
+  + A type in a function declaration has to have a name assigned to it.
+
 Generics
 ========
 
 Generics are not defined explicitly, but by leaving type information out for the compiler to determine:
 
 ```
-double -> a -> a'
+double -> a' -> a'
   a + a
   
 double 2 // Results in 4
 ```
 
-The only requirement is that whatever type `a` turns out to be, has the `+` operator. Also notice that the return type: `a'` (pronouced A-Prime). This is how a generic return type is defined.  It means that whatever type `a` is, that's the type the function will return.  So say there are two parameters:
+The only requirement is that whatever type `a` turns out to be, has the `+` operator. Also notice the types: `a'` (pronouced A-Prime). This is how a generic type is denoted.  So say there are two parameters:
 
 ```
-encode -> a -> b -> b`
+encode -> a' -> b' -> b`
   a.encode b
 ```  
 
@@ -70,9 +74,10 @@ Pattern matching is nothing more than a fancy `switch` statement, however most w
 
 ```
 randomName -> n int -> string
-  0 -> "Bill" // Called if n is 0
-  9 -> "Sandy" // Called if n is 9
-  n -> "John" // default
+  match randomName
+    0 -> "Bill" // Called if n is 0
+    9 -> "Sandy" // Called if n is 9
+    n -> "John" // default
 ```
 
 Immutability
@@ -85,6 +90,16 @@ This has some large implications, such as no loops! Again, think recursion (idea
 
 Higher order functions
 ======================
+
+Functions can take functions as a parameter:
+
+```
+funcA -> a int -> funcB -> b int -> int -> int
+  funcB a
+```
+
+This example demonstrates a function (`funcA`) that takes an `int` and a function (`funcB`) and returns an `int`. `funcB` takes an `int` and returns an `int`.
+
 
 Operator overloading
 ====================
