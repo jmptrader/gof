@@ -13,7 +13,6 @@ Go Functional (GoF) has many of the features that Go users crave:
 + Pattern Matching
 + Immutability
 + Higher order functions
-+ Operator overloading
 + More to come!
 
 The intention of the language is to allow you to write strongly typed functional algorithms while still having the vast (and growing) Golang libraries.  Ideally, a system's program could use both GoF and Golang interchangeably.
@@ -120,5 +119,7 @@ x = add 1 // x is now a func -> a int -> int
 y = x 2 // y is now 3
 ```
 
-Operator overloading
-====================
+Notes
+=====
+
+This is a new project and really a proof of concept.  Types haven't been nailed down yet, but are intended to be added.
