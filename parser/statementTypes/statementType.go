@@ -11,4 +11,5 @@ const (
 
 type Statement interface {
 	Type() StatementType
+	AddLine(tokens []string)
 }

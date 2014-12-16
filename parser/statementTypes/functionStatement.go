@@ -4,10 +4,8 @@ type FunctionStatement struct {
 	name string
 }
 
-func NewFunctionStatement(tokens []string) Statement {
-	return &FunctionStatement{
-		name: fetchName(tokens[1]),
-	}
+func NewFunctionStatement() Statement {
+	return &FunctionStatement{}
 }
 
 func (fs *FunctionStatement) Type() StatementType {
@@ -23,4 +21,7 @@ func fetchName(name string) string {
 		return ""
 	}
 	return name
+}
+
+func (ds *FunctionStatement) AddLine(tokens []string) {
 }

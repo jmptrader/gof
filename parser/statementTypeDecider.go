@@ -6,18 +6,22 @@ import (
 )
 
 func StatementTypeDecider(tokens []string) (statementTypes.Statement, error) {
+	var statement statementTypes.Statement
 	switch tokens[0] {
 	case "func":
-		return statementTypes.NewFunctionStatement(tokens), nil
+		statement = statementTypes.NewFunctionStatement()
 	case "if":
-		return statementTypes.NewIfStatement(tokens), nil
+		statement = statementTypes.NewIfStatement()
 	case "match":
-		return statementTypes.NewMatchStatement(tokens), nil
+		statement = statementTypes.NewMatchStatement()
 	default:
 		if tokens[1] != "=" {
 			return nil, errors.New("Unknown statement: " + tokens[0])
 		}
 
-		return statementTypes.NewDeclarationStatement(tokens), nil
+		statement = statementTypes.NewDeclarationStatement()
 	}
+
+	statement.AddLine(tokens)
+	return statement, nil
 }
