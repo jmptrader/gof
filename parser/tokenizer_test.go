@@ -26,5 +26,4 @@ var _ = Describe("Parser", func() {
 			Expect(err).ToNot(BeNil())
 		})
 	})
-
 })
