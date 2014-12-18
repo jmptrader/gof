@@ -11,11 +11,13 @@ type BlockScanner struct {
 	block    string
 	prevLine string
 	scanner  *bufio.Scanner
+	pre      func(string) string
 }
 
-func NewBlockScanner(code io.Reader) *BlockScanner {
+func NewBlockScanner(code io.Reader, preRead func(string) string) *BlockScanner {
 	return &BlockScanner{
 		scanner: bufio.NewScanner(code),
+		pre:     preRead,
 	}
 }
 
@@ -27,7 +29,7 @@ func (bs *BlockScanner) Scan() bool {
 		if len(bs.prevLine) > 0 {
 			text = bs.prevLine
 		} else {
-			text = bs.scanner.Text()
+			text = bs.getLineFromScanner()
 		}
 		tabs := startsWithTab(text)
 		tabbed := tabs > 0
@@ -36,13 +38,17 @@ func (bs *BlockScanner) Scan() bool {
 			bs.block = bs.block + "\n" + trim(text, tabs)
 			bs.prevLine = ""
 		} else {
-			bs.prevLine = bs.scanner.Text()
+			bs.prevLine = bs.getLineFromScanner()
 			return true
 		}
 	}
 
 	bs.err = bs.scanner.Err()
 	return false
+}
+
+func (bs *BlockScanner) getLineFromScanner() string {
+	return bs.pre(bs.scanner.Text())
 }
 
 func trim(line string, tabs int) string {
