@@ -15,6 +15,12 @@ type BlockScanner struct {
 }
 
 func NewBlockScanner(code io.Reader, preRead func(string) string) *BlockScanner {
+	if preRead == nil {
+		preRead = func(s string) string {
+			return s
+		}
+	}
+
 	return &BlockScanner{
 		scanner: bufio.NewScanner(code),
 		pre:     preRead,
