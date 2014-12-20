@@ -9,21 +9,24 @@ import (
 
 var _ = Describe("Parser", func() {
 	Context("Tokenize", func() {
-		It("Should break up tokens based on newlines", func() {
-			_, tokens, err := Tokenize("		func a -> b int -> int ")
-			Expect(err).To(BeNil())
-			Expect(tokens).To(Equal([]string{"func", "a", "->", "b", "int", "->", "int"}))
+		It("Should split up a line based on whitespace", func() {
+			code := "a b c"
+			a, rest := Tokenize(code)
+			Expect(a).To(Equal("a"))
+			Expect(rest).To(Equal("b c"))
 		})
-
-		It("Should give the number of tabs at the beginning of the line", func() {
-			tabs, _, err := Tokenize("		func a -> b int -> int")
-			Expect(err).To(BeNil())
-			Expect(tabs).To(Equal(2))
+		It("Should return an empty 2nd string when it cant split", func() {
+			code := "abc"
+			a, rest := Tokenize(code)
+			Expect(a).To(Equal("abc"))
+			Expect(rest).To(Equal(""))
 		})
-
-		It("Should return an error if the line starts with any spaces", func() {
-			_, _, err := Tokenize("		 func a -> b int -> int")
-			Expect(err).ToNot(BeNil())
+	})
+	Context("Lines", func() {
+		It("Should break up all the lines in the block", func() {
+			block := "a\nb\nc"
+			lines := Lines(block)
+			Expect(lines).To(Equal([]string{"a", "b", "c"}))
 		})
 	})
 })

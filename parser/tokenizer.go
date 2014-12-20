@@ -1,27 +1,30 @@
 package parser
 
 import (
-	"errors"
+	"bufio"
+	"regexp"
 	"strings"
 )
 
-func Tokenize(line string) (int, []string, error) {
-	tabs, trimmedLine := splitTabs(line)
-	if trimmedLine[0] == ' ' {
-		return -1, nil, errors.New("Lines can not begin with a space. Use tabs.")
-	}
+var reg *regexp.Regexp
 
-	return tabs, strings.Fields(trimmedLine), nil
+func init() {
+	reg = regexp.MustCompile("\\s")
 }
 
-func splitTabs(line string) (int, string) {
-	tabs := 0
-	for _, c := range line {
-		if c == '	' {
-			tabs++
-		} else {
-			break
-		}
+func Tokenize(line string) (string, string) {
+	values := reg.Split(line, 2)
+	if len(values) == 2 {
+		return values[0], values[1]
 	}
-	return tabs, line[tabs:]
+	return values[0], ""
+}
+
+func Lines(block string) []string {
+	scanner := bufio.NewScanner(strings.NewReader(block))
+	lines := make([]string, 0)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return lines
 }
