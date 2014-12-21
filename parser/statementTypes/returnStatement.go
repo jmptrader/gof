@@ -87,10 +87,48 @@ func toInfix(opQueue []string, index int) (string, error) {
 	if len(opQueue) <= index {
 		return opQueue[0], nil
 	} else if parser.IsOperator(opQueue[index]) {
-		combined := "(" + opQueue[index-2] + opQueue[index] + opQueue[index-1] + ")"
+		combined := fmt.Sprintf("(%s%s%s)", addTypeToNumber(opQueue[index-2]), opQueue[index], addTypeToNumber(opQueue[index-1]))
 		return toInfix(append(opQueue[:index-2], combine(combined, opQueue[index+1:])...), index-2)
 	} else {
 		return toInfix(opQueue, index+1)
+	}
+}
+
+func addTypeToNumber(token string) string {
+	if !parser.IsNumber(token) || len(token) <= 1 {
+		return token
+	}
+
+	suffix1 := token[len(token)-1:]
+	token1 := token[:len(token)-1]
+	suffix2 := ""
+	token2 := ""
+
+	if len(token) > 2 {
+		suffix2 = token[len(token)-2:]
+		token2 = token[:len(token)-2]
+	}
+
+	if suffix2 == "ub" {
+		return fmt.Sprintf("uint8(%s)", token2)
+	} else if suffix1 == "b" {
+		return fmt.Sprintf("int8(%s)", token1)
+	} else if suffix2 == "uh" {
+		return fmt.Sprintf("uint16(%s)", token2)
+	} else if suffix1 == "h" {
+		return fmt.Sprintf("int16(%s)", token1)
+	} else if suffix2 == "ui" {
+		return fmt.Sprintf("uint32(%s)", token2)
+	} else if suffix2 == "ul" {
+		return fmt.Sprintf("uint64(%s)", token2)
+	} else if suffix1 == "l" {
+		return fmt.Sprintf("int64(%s)", token1)
+	} else if suffix1 == "f" {
+		return fmt.Sprintf("float32(%s)", token1)
+	} else if len(suffix2) > 0 && suffix2[0] == '.' {
+		return fmt.Sprintf("float64(%s)", token)
+	} else {
+		return token
 	}
 }
 
