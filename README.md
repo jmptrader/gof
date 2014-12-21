@@ -21,6 +21,34 @@ The intention of the language is to allow you to write strongly typed functional
 
 Functions
 =======
+Language Details
+================
+
+####Spaces vs. Tabs
+
+GoF uses tabs instead of spaces to match what `go fmt` enforces.  Even though `go fmt` won't work with GoF code, the convention is still adhered to.
+
+####Numeric Constants
+
+GoF is strict with types, so it picking the correct numeric type is important.  Like many languages, use a suffix to tell the compiler which numeric type was intended.
+
+Type    | Suffix
+----    | ------
+int8    | b
+uint8   | ub
+int16   | h
+uint16  | uh
+int32   | (default)
+uint32  | ui
+int64   | l
+uint64  | ul
+float32 | f
+float64 | (default with .0)
+
+NOTE: The suffix IS case sensitive. Meaning a `3UI` is invalid.
+
+Lambdas
+=======
 
 Functions have a simple syntax:
 
