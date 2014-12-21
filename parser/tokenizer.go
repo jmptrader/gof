@@ -6,14 +6,21 @@ import (
 	"strings"
 )
 
-var reg *regexp.Regexp
+var regToken *regexp.Regexp
+var regNum *regexp.Regexp
+var regFunc *regexp.Regexp
+var regOps *regexp.Regexp
+var ops []string = []string{"+", "-", "*", "/"}
 
 func init() {
-	reg = regexp.MustCompile("\\s")
+	regToken = regexp.MustCompile("\\s")
+	regNum = regexp.MustCompile("^[0-9]+(\\.[0-9]+)?$")
+	regFunc = regexp.MustCompile("^[a-zA-Z][a-zA-z0-9]*$")
+	regOps = regexp.MustCompile("^" + buildOpsPattern(ops) + "$")
 }
 
 func Tokenize(line string) (string, string) {
-	values := reg.Split(line, 2)
+	values := regToken.Split(line, 2)
 	if len(values) == 2 {
 		return values[0], values[1]
 	}
@@ -27,4 +34,32 @@ func Lines(block string) []string {
 		lines = append(lines, scanner.Text())
 	}
 	return lines
+}
+
+func IsNumber(value string) bool {
+	return regNum.MatchString(value)
+}
+
+func IsBool(value string) bool {
+	return value == "true" || value == "false"
+}
+
+func IsPrimitive(value string) bool {
+	return IsNumber(value) || IsBool(value)
+}
+
+func ValidFunctionName(value string) bool {
+	return regFunc.MatchString(value)
+}
+
+func IsOperator(value string) bool {
+	return regOps.MatchString(value)
+}
+
+func buildOpsPattern(ops []string) string {
+	result := "["
+	for _, o := range ops {
+		result = result + "\\" + o
+	}
+	return result + "]"
 }
