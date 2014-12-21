@@ -45,6 +45,8 @@ float64 | (default with .0)
 
 NOTE: The suffix IS case sensitive. Meaning a `3UI` is invalid.
 
+To denote a hex value, prefix the number with a `0x`. For octal, prefix the value with a `0`.  This is the same as Go.
+
 Lambdas
 =======
 
