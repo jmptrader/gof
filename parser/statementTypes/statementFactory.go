@@ -2,31 +2,45 @@ package statementTypes
 
 import "github.com/apoydence/GoF/parser"
 
+type TypeName string
+
+type FunctionDeclaration interface {
+	ReturnType() TypeName
+	ArgumentTypes() []TypeName
+}
+
+type FunctionMap interface {
+	GetFunction(name string) FunctionDeclaration
+	AddFunction(name string, f FunctionDeclaration) (string, error)
+}
+
 type Statement interface {
-	Parse(block string, nextBlockScanner *parser.ScanPeeker) Statement
+	GenerateGo(fm FunctionMap) (string, error)
+}
+
+type StatementParser interface {
+	Parse(block string, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) Statement
 }
 
 type StatementFactory struct {
-	blockPeeker *parser.ScanPeeker
-	statements  []Statement
+	statements []StatementParser
 }
 
-func NewStatementFactory(blockScanner *parser.BlockScanner, statements ...Statement) *StatementFactory {
+func NewStatementFactory(statements ...StatementParser) *StatementFactory {
 	return &StatementFactory{
-		blockPeeker: parser.NewScanPeeker(blockScanner),
-		statements:  statements,
+		statements: statements,
 	}
 }
 
-func (sf *StatementFactory) Next() Statement {
-	ok, value := sf.blockPeeker.Read()
+func (sf *StatementFactory) Read(blockPeeker *parser.ScanPeeker) Statement {
+	ok, value := blockPeeker.Read()
 
 	if !ok {
 		return nil
 	}
 
 	for _, s := range sf.statements {
-		statement := s.Parse(value, sf.blockPeeker)
+		statement := s.Parse(value, blockPeeker, sf)
 		if statement != nil {
 			return statement
 		}
