@@ -32,12 +32,22 @@ var _ = Describe("Parser", func() {
 	Context("IsNumber", func() {
 		It("Should be distinguish a float or int", func() {
 			i := "324"
-			f := "324.2"
+			d := "324.2"
+			f := "324.2f"
+			ui := "324ui"
+			l := "324l"
+			b := "40b"
+			hex := "0x234"
 			x := "34x.3"
 			y := "34.3.1"
 			a := "asd"
 			Expect(IsNumber(i)).To(BeTrue())
+			Expect(IsNumber(d)).To(BeTrue())
 			Expect(IsNumber(f)).To(BeTrue())
+			Expect(IsNumber(ui)).To(BeTrue())
+			Expect(IsNumber(l)).To(BeTrue())
+			Expect(IsNumber(b)).To(BeTrue())
+			Expect(IsNumber(hex)).To(BeTrue())
 			Expect(IsNumber(x)).To(BeFalse())
 			Expect(IsNumber(y)).To(BeFalse())
 			Expect(IsNumber(a)).To(BeFalse())

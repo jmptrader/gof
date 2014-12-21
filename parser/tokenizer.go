@@ -14,7 +14,7 @@ var ops []string = []string{"+", "-", "*", "/"}
 
 func init() {
 	regToken = regexp.MustCompile("\\s")
-	regNum = regexp.MustCompile("^[0-9]+(\\.[0-9]+)?$")
+	regNum = regexp.MustCompile("^(0x)?[0-9]+((u?[bhl])|(ui)|f|(\\.[0-9]+f?))?$")
 	regFunc = regexp.MustCompile("^[a-zA-Z][a-zA-z0-9]*$")
 	regOps = regexp.MustCompile("^" + buildOpsPattern(ops) + "$")
 }
