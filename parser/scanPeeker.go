@@ -1,5 +1,10 @@
 package parser
 
+import (
+	"bufio"
+	"strings"
+)
+
 type Scanner interface {
 	Scan() bool
 	Text() string
@@ -18,6 +23,10 @@ func NewScanPeeker(scanner Scanner) *ScanPeeker {
 		scanner:   scanner,
 		scanCheck: true,
 	}
+}
+
+func NewScanPeekerStr(block string) *ScanPeeker {
+	return NewScanPeeker(bufio.NewScanner(strings.NewReader(block)))
 }
 
 func (sp *ScanPeeker) Peek() (bool, string) {
