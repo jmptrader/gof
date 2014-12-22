@@ -6,8 +6,9 @@ import (
 )
 
 type funcMap struct {
-	fm    map[string]*FunctionDeclaration
-	count int
+	prevScope FunctionMap
+	fm        map[string]*FunctionDeclaration
+	count     int
 }
 
 func NewFunctionMap() FunctionMap {
@@ -16,20 +17,33 @@ func NewFunctionMap() FunctionMap {
 	}
 }
 
+func newFunctionMap(prevScope FunctionMap) FunctionMap {
+	return &funcMap{
+		fm:        make(map[string]*FunctionDeclaration),
+		prevScope: prevScope,
+	}
+}
+
 func (fm *funcMap) GetFunction(name string) *FunctionDeclaration {
 	if d, ok := fm.fm[name]; ok {
 		return d
+	} else if fm.prevScope != nil {
+		return fm.prevScope.GetFunction(name)
 	}
 	return nil
 }
 
 func (fm *funcMap) AddFunction(name string, f *FunctionDeclaration) (string, error) {
-	if _, ok := fm.fm[name]; ok {
+	if fm.GetFunction(name) != nil {
 		return "", errors.New("The function name'" + name + "' is already allocated.")
 	}
 
 	fm.fm[name] = f
 	return fm.getNextFunctionName(), nil
+}
+
+func (fm *funcMap) NextScopeLayer() FunctionMap {
+	return newFunctionMap(fm)
 }
 
 func (fm *funcMap) getNextFunctionName() string {
