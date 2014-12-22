@@ -71,6 +71,6 @@ func (ms mockStatement) Parse(block string, nextBlockScanner *parser.ScanPeeker,
 	return nil
 }
 
-func (ms mockStatement) GenerateGo(fm FunctionMap) (string, error) {
-	return "", nil
+func (ms mockStatement) GenerateGo(fm FunctionMap) (string, TypeName, error) {
+	return "", "", nil
 }

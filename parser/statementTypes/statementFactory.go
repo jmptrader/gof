@@ -15,7 +15,7 @@ type FunctionMap interface {
 }
 
 type Statement interface {
-	GenerateGo(fm FunctionMap) (string, error)
+	GenerateGo(fm FunctionMap) (string, TypeName, error)
 }
 
 type StatementParser interface {
