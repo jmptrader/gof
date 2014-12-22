@@ -7,6 +7,7 @@ type TypeName string
 type FunctionMap interface {
 	GetFunction(name string) *FunctionDeclaration
 	AddFunction(name string, f *FunctionDeclaration) (string, error)
+	NextScopeLayer() FunctionMap
 }
 
 type Statement interface {
