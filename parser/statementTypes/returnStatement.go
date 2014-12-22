@@ -44,14 +44,7 @@ func (ds *ReturnStatement) GenerateGo(fm FunctionMap) (string, TypeName, error) 
 
 	bs := toBlockSpec(ops)
 
-	return wrapCode(toInfix(bs, 0))
-}
-
-func wrapCode(code string, returnType TypeName, err error) (string, TypeName, error) {
-	if err != nil {
-		return "", "", err
-	}
-	return fmt.Sprintf("func() %s {\n\t%s\n}", returnType, code), returnType, nil
+	return toInfix(bs, 0)
 }
 
 // This uses the shunting-yard algorithm
