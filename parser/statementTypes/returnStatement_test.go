@@ -31,7 +31,7 @@ var _ = Describe("ReturnStatement", func() {
 				genGo, returnType, err := r.GenerateGo(nil)
 				Expect(err).To(BeNil())
 				Expect(returnType).To(BeEquivalentTo("int32"))
-				Expect(genGo).To(Equal("func() int32 {\n\t((1+11)-(10/2))\n}"))
+				Expect(genGo).To(Equal("((1+11)-(10/2))"))
 			})
 			It("Should generate the proper Go code with proper numeric types", func() {
 				code := "( 1b + 11b ) - 10b / 2b"
@@ -39,7 +39,7 @@ var _ = Describe("ReturnStatement", func() {
 				genGo, returnType, err := r.GenerateGo(nil)
 				Expect(err).To(BeNil())
 				Expect(returnType).To(BeEquivalentTo("int8"))
-				Expect(genGo).To(Equal("func() int8 {\n\t((int8(1)+int8(11))-(int8(10)/int8(2)))\n}"))
+				Expect(genGo).To(Equal("((int8(1)+int8(11))-(int8(10)/int8(2)))"))
 			})
 		})
 	})
