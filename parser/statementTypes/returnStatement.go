@@ -36,10 +36,10 @@ func (rs ReturnStatement) Parse(block string, nextBlockScanner *parser.ScanPeeke
 	return newReturnStatement(block)
 }
 
-func (ds *ReturnStatement) GenerateGo(fm FunctionMap) (string, error) {
+func (ds *ReturnStatement) GenerateGo(fm FunctionMap) (string, TypeName, error) {
 	ops, err := toRpn(ds.block, []string{}, []string{})
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	bs := toBlockSpec(ops)
@@ -47,11 +47,11 @@ func (ds *ReturnStatement) GenerateGo(fm FunctionMap) (string, error) {
 	return wrapCode(toInfix(bs, 0))
 }
 
-func wrapCode(code string, returnType TypeName, err error) (string, error) {
+func wrapCode(code string, returnType TypeName, err error) (string, TypeName, error) {
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
-	return fmt.Sprintf("func() %s {\n\t%s\n}", returnType, code), nil
+	return fmt.Sprintf("func() %s {\n\t%s\n}", returnType, code), returnType, nil
 }
 
 // This uses the shunting-yard algorithm

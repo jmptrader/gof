@@ -60,8 +60,8 @@ func combineBlock(firstLine string, lines []string) string {
 	return result
 }
 
-func (ds *DeclarationStatement) GenerateGo(fm FunctionMap) (string, error) {
-	return "", nil
+func (ds *DeclarationStatement) GenerateGo(fm FunctionMap) (string, TypeName, error) {
+	return "", "", nil
 }
 
 func (ds *DeclarationStatement) VariableName() string {
