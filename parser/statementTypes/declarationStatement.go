@@ -66,7 +66,7 @@ func combineBlock(firstLine string, lines []string) string {
 }
 
 func (ds *DeclarationStatement) GenerateGo(fm FunctionMap) (string, TypeName, error) {
-	innerCode, returnType, err := ds.innerStatement.GenerateGo(fm)
+	innerCode, returnType, err := ds.innerStatement.GenerateGo(fm.NextScopeLayer())
 
 	if err != nil {
 		return "", "", err
