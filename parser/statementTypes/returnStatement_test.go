@@ -24,19 +24,21 @@ var _ = Describe("ReturnStatement", func() {
 		})
 	})
 	Context("GenerateGo", func() {
-		It("Should generate the proper Go code with no functions", func() {
-			code := "( 1 + 11 ) - 10 / 2"
-			r := statementParser.Parse(code, nil, factory)
-			genGo, err := r.GenerateGo(nil)
-			Expect(err).To(BeNil())
-			Expect(genGo).To(Equal("func() int {\n\t((1+11)-(10/2))\n}"))
-		})
-		It("Should generate the proper Go code with proper numeric types", func() {
-			code := "( 1b + 11b ) - 10b / 2b"
-			r := statementParser.Parse(code, nil, factory)
-			genGo, err := r.GenerateGo(nil)
-			Expect(err).To(BeNil())
-			Expect(genGo).To(Equal("func() int {\n\t((int8(1)+int8(11))-(int8(10)/int8(2)))\n}"))
+		Context("No functions", func() {
+			It("Should generate the proper Go code", func() {
+				code := "( 1 + 11 ) - 10 / 2"
+				r := statementParser.Parse(code, nil, factory)
+				genGo, err := r.GenerateGo(nil)
+				Expect(err).To(BeNil())
+				Expect(genGo).To(Equal("func() int32 {\n\t((1+11)-(10/2))\n}"))
+			})
+			It("Should generate the proper Go code with proper numeric types", func() {
+				code := "( 1b + 11b ) - 10b / 2b"
+				r := statementParser.Parse(code, nil, factory)
+				genGo, err := r.GenerateGo(nil)
+				Expect(err).To(BeNil())
+				Expect(genGo).To(Equal("func() int8 {\n\t((int8(1)+int8(11))-(int8(10)/int8(2)))\n}"))
+			})
 		})
 	})
 })
