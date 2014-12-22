@@ -4,14 +4,9 @@ import "github.com/apoydence/GoF/parser"
 
 type TypeName string
 
-type FunctionDeclaration interface {
-	ReturnType() TypeName
-	ArgumentTypes() []TypeName
-}
-
 type FunctionMap interface {
-	GetFunction(name string) FunctionDeclaration
-	AddFunction(name string, f FunctionDeclaration) (string, error)
+	GetFunction(name string) *FunctionDeclaration
+	AddFunction(name string, f *FunctionDeclaration) (string, error)
 }
 
 type Statement interface {
