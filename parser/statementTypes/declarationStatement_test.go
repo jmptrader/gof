@@ -8,14 +8,15 @@ import (
 )
 
 var _ = Describe("DeclarationStatement", func() {
-	Context("Parse", func() {
-		var statementParser StatementParser
-		var factory *StatementFactory
+	var statementParser StatementParser
+	var factory *StatementFactory
 
-		BeforeEach(func() {
-			statementParser = NewDeclarationParser()
-			factory = NewStatementFactory(statementParser)
-		})
+	BeforeEach(func() {
+		statementParser = NewDeclarationParser()
+		returnStatement := NewReturnStatementParser()
+		factory = NewStatementFactory(statementParser, returnStatement)
+	})
+	Context("Parse", func() {
 
 		It("Should pick out any declaration", func() {
 			code := "a = b + 9"
@@ -35,6 +36,21 @@ var _ = Describe("DeclarationStatement", func() {
 			code := "if true\n\t9\nelse\n\t10"
 			d := statementParser.Parse(code, nil, factory)
 			Expect(d).To(BeNil())
+		})
+	})
+	Context("GenerateGo", func() {
+		It("Should return proper go code", func() {
+			code := "a = 9 + 6"
+			d := statementParser.Parse(code, nil, factory).(*DeclarationStatement)
+			fm := NewFunctionMap()
+			gocode, returnType, err := d.GenerateGo(fm)
+			Expect(err).To(BeNil())
+			Expect(returnType).To(BeEquivalentTo("int32"))
+			Expect(gocode).To(Equal("var _0 func() int32\n_0 = func(){\n\treturn (9+6)\n}"))
+			fd := fm.GetFunction("a")
+			Expect(fd).ToNot(BeNil())
+			Expect(fd.ReturnType()).To(BeEquivalentTo("int32"))
+			Expect(len(fd.ArgumentTypes())).To(Equal(0))
 		})
 	})
 })

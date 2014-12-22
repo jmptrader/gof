@@ -1,22 +1,25 @@
 package statementTypes
 
 import (
+	"fmt"
 	"github.com/apoydence/GoF/parser"
 )
 
 type DeclarationStatement struct {
-	varName string
-	block   string
+	varName        string
+	code           string
+	innerStatement Statement
 }
 
 func NewDeclarationParser() StatementParser {
 	return DeclarationStatement{}
 }
 
-func newDeclarationStatement(varName, block string) Statement {
+func newDeclarationStatement(varName, code string, innerStatement Statement) Statement {
 	return &DeclarationStatement{
-		varName: varName,
-		block:   block,
+		varName:        varName,
+		code:           code,
+		innerStatement: innerStatement,
 	}
 }
 
@@ -26,7 +29,9 @@ func (ds DeclarationStatement) Parse(block string, nextBlockScanner *parser.Scan
 	ok, varName, restOfLine := splitEquals(lines[0])
 
 	if ok {
-		return newDeclarationStatement(varName, combineBlock(restOfLine, lines[1:]))
+		combinedLine := combineBlock(restOfLine, lines[1:])
+		peeker := parser.NewScanPeekerStr(combinedLine)
+		return newDeclarationStatement(varName, combinedLine, factory.Read(peeker))
 	}
 
 	return nil
@@ -61,7 +66,17 @@ func combineBlock(firstLine string, lines []string) string {
 }
 
 func (ds *DeclarationStatement) GenerateGo(fm FunctionMap) (string, TypeName, error) {
-	return "", "", nil
+	innerCode, returnType, err := ds.innerStatement.GenerateGo(fm)
+
+	if err != nil {
+		return "", "", err
+	}
+
+	fd := NewFunctionDeclaration(returnType)
+	name, err := fm.AddFunction(ds.varName, fd)
+
+	genCode := fmt.Sprintf("var %s func() %s\n%s = func(){\n\treturn %s\n}", name, returnType, name, innerCode)
+	return genCode, returnType, nil
 }
 
 func (ds *DeclarationStatement) VariableName() string {
@@ -69,5 +84,5 @@ func (ds *DeclarationStatement) VariableName() string {
 }
 
 func (ds *DeclarationStatement) CodeBlock() string {
-	return ds.block
+	return ds.code
 }
