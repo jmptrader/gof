@@ -16,7 +16,11 @@ func toRpn(line string, outputQueue []rpnValue, opStack []rpnValue, fm FunctionM
 	} else if token == ")" {
 		return toRpnLeftParen(token, rest, outputQueue, opStack, fm)
 	} else if fd := fm.GetFunction(token); fd != nil {
-
+		if fd.IsDefinition() {
+			return toRpn(rest, append(outputQueue, newPrimRpnValue(token)), opStack, fm)
+		} else {
+			return toRpn(rest, outputQueue, append(opStack, newOpRpnValue(token, FuncCall)), fm)
+		}
 	} else if token == "" {
 		for i := len(opStack) - 1; i > -1; i-- {
 			outputQueue = append(outputQueue, opStack[i])
@@ -62,9 +66,9 @@ func rpnToString(ops []rpnValue) []string {
 
 func opPrec(op string) int {
 	if op == "+" || op == "-" {
-		return 0
+		return AddSub
 	} else if op == "*" || op == "/" {
-		return 1
+		return MultDiv
 	}
 	panic("Unknown op: '" + op + "'")
 }

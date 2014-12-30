@@ -51,7 +51,7 @@ var _ = Describe("DeclarationStatement", func() {
 			fd := fm.GetFunction("a")
 			Expect(fd).ToNot(BeNil())
 			Expect(fd.ReturnType()).To(BeEquivalentTo("int32"))
-			Expect(len(fd.ArgumentTypes())).To(Equal(0))
+			Expect(fd.IsDefinition()).To(BeTrue())
 		})
 	})
 })
