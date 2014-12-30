@@ -1,6 +1,7 @@
 package statementTypes_test
 
 import (
+	"github.com/apoydence/GoF/parser/expressionParsing"
 	. "github.com/apoydence/GoF/parser/statementTypes"
 
 	. "github.com/onsi/ginkgo"
@@ -42,7 +43,7 @@ var _ = Describe("DeclarationStatement", func() {
 		It("Should return proper go code", func() {
 			code := "a = 9 + 6"
 			d := statementParser.Parse(code, nil, factory).(*DeclarationStatement)
-			fm := NewFunctionMap()
+			fm := expressionParsing.NewFunctionMap()
 			gocode, returnType, err := d.GenerateGo(fm)
 			Expect(err).To(BeNil())
 			Expect(returnType).To(BeEquivalentTo("int32"))

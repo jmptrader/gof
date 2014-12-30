@@ -2,6 +2,7 @@ package statementTypes_test
 
 import (
 	"github.com/apoydence/GoF/parser"
+	"github.com/apoydence/GoF/parser/expressionParsing"
 	. "github.com/apoydence/GoF/parser/statementTypes"
 	"strings"
 
@@ -71,6 +72,6 @@ func (ms mockStatement) Parse(block string, nextBlockScanner *parser.ScanPeeker,
 	return nil
 }
 
-func (ms mockStatement) GenerateGo(fm FunctionMap) (string, TypeName, error) {
+func (ms mockStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeName, error) {
 	return "", "", nil
 }

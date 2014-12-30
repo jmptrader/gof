@@ -1,4 +1,4 @@
-package statementTypes
+package expressionParsing
 
 import (
 	"errors"

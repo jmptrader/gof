@@ -1,17 +1,12 @@
 package statementTypes
 
-import "github.com/apoydence/GoF/parser"
-
-type TypeName string
-
-type FunctionMap interface {
-	GetFunction(name string) *FunctionDeclaration
-	AddFunction(name string, f *FunctionDeclaration) (string, error)
-	NextScopeLayer() FunctionMap
-}
+import (
+	"github.com/apoydence/GoF/parser"
+	"github.com/apoydence/GoF/parser/expressionParsing"
+)
 
 type Statement interface {
-	GenerateGo(fm FunctionMap) (string, TypeName, error)
+	GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeName, error)
 }
 
 type StatementParser interface {
