@@ -39,7 +39,10 @@ func (fm *funcMap) AddFunction(name string, f *FunctionDeclaration) (string, err
 	}
 
 	fm.fm[name] = f
-	return fm.getNextFunctionName(), nil
+	genName := fm.getNextFunctionName()
+	f.SetName(genName)
+
+	return genName, nil
 }
 
 func (fm *funcMap) NextScopeLayer() FunctionMap {

@@ -1,5 +1,11 @@
 package expressionParsing
 
+const (
+	AddSub int = iota
+	MultDiv
+	FuncCall
+)
+
 type rpnValue struct {
 	prec     int
 	token    string
