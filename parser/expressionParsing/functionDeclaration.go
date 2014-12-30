@@ -1,4 +1,6 @@
-package statementTypes
+package expressionParsing
+
+type TypeName string
 
 type FunctionDeclaration struct {
 	returnType TypeName

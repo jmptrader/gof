@@ -1,6 +1,7 @@
 package statementTypes_test
 
 import (
+	"github.com/apoydence/GoF/parser/expressionParsing"
 	. "github.com/apoydence/GoF/parser/statementTypes"
 
 	. "github.com/onsi/ginkgo"
@@ -24,11 +25,15 @@ var _ = Describe("ReturnStatement", func() {
 		})
 	})
 	Context("GenerateGo", func() {
+		var funcMap expressionParsing.FunctionMap
+		BeforeEach(func() {
+			funcMap = expressionParsing.NewFunctionMap()
+		})
 		Context("No functions", func() {
 			It("Should generate the proper Go code", func() {
 				code := "( 1 + 11 ) - 10 / 2"
 				r := statementParser.Parse(code, nil, factory)
-				genGo, returnType, err := r.GenerateGo(nil)
+				genGo, returnType, err := r.GenerateGo(funcMap)
 				Expect(err).To(BeNil())
 				Expect(returnType).To(BeEquivalentTo("int32"))
 				Expect(genGo).To(Equal("((1+11)-(10/2))"))
@@ -36,10 +41,24 @@ var _ = Describe("ReturnStatement", func() {
 			It("Should generate the proper Go code with proper numeric types", func() {
 				code := "( 1b + 11b ) - 10b / 2b"
 				r := statementParser.Parse(code, nil, factory)
-				genGo, returnType, err := r.GenerateGo(nil)
+				genGo, returnType, err := r.GenerateGo(funcMap)
 				Expect(err).To(BeNil())
 				Expect(returnType).To(BeEquivalentTo("int8"))
 				Expect(genGo).To(Equal("((int8(1)+int8(11))-(int8(10)/int8(2)))"))
+			})
+		})
+		PContext("With functions", func() {
+			It("Should generate the proper Go code with a argument-less function", func() {
+				code := "( 1 + 11 ) - a / 2"
+				r := statementParser.Parse(code, nil, factory)
+				fm := expressionParsing.NewFunctionMap()
+				fm.AddFunction("a", expressionParsing.NewFunctionDeclaration("int32"))
+				genGo, returnType, err := r.GenerateGo(fm)
+				Expect(err).To(BeNil())
+				Expect(returnType).To(BeEquivalentTo("int32"))
+				Expect(genGo).To(Equal("((1+11)-(_0()/2))"))
+			})
+			It("Should generate the proper Go code with a function", func() {
 			})
 		})
 	})
