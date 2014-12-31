@@ -6,7 +6,7 @@ import (
 )
 
 type Statement interface {
-	GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeName, error)
+	GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, error)
 }
 
 type StatementParser interface {

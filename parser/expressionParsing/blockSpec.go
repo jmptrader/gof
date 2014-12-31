@@ -2,7 +2,7 @@ package expressionParsing
 
 type blockSpec struct {
 	block     string
-	valueType TypeName
+	valueType TypeDefinition
 }
 
 func toBlockSpec(opQueue []string, fm FunctionMap) []*blockSpec {
@@ -13,25 +13,25 @@ func toBlockSpec(opQueue []string, fm FunctionMap) []*blockSpec {
 	return result
 }
 
-func newBlockSpec(op string, valueType TypeName) *blockSpec {
+func newBlockSpec(op string, valueType TypeDefinition) *blockSpec {
 	return &blockSpec{
 		block:     op,
 		valueType: valueType,
 	}
 }
 
-func findType(token string, fm FunctionMap) (string, TypeName) {
+func findType(token string, fm FunctionMap) (string, TypeDefinition) {
 	if fd := fm.GetFunction(token); fd != nil {
 		if fd.IsDefinition() {
-			return fd.Name() + "()", fd.ReturnType()
+			return fd.FuncName() + "()", fd.ReturnType()
 		}
-		return fd.Name(), fd.ReturnType()
+		return token, fd.ReturnType()
 	} else {
 		return findPrimType(token)
 	}
 }
 
-func findPrimType(token string) (string, TypeName) {
+func findPrimType(token string) (string, TypeDefinition) {
 	suffix1 := token[len(token)-1:]
 	token1 := token[:len(token)-1]
 	suffix2 := ""
@@ -43,24 +43,24 @@ func findPrimType(token string) (string, TypeName) {
 	}
 
 	if suffix2 == "ub" {
-		return token2, "uint8"
+		return token2, NewPrimTypeDefinition("uint8")
 	} else if suffix1 == "b" {
-		return token1, "int8"
+		return token1, NewPrimTypeDefinition("int8")
 	} else if suffix2 == "uh" {
-		return token2, "uint16"
+		return token2, NewPrimTypeDefinition("uint16")
 	} else if suffix1 == "h" {
-		return token1, "int16"
+		return token1, NewPrimTypeDefinition("int16")
 	} else if suffix2 == "ui" {
-		return token2, "uint32"
+		return token2, NewPrimTypeDefinition("uint32")
 	} else if suffix2 == "ul" {
-		return token2, "uint64"
+		return token2, NewPrimTypeDefinition("uint64")
 	} else if suffix1 == "l" {
-		return token1, "int64"
+		return token1, NewPrimTypeDefinition("int64")
 	} else if suffix1 == "f" {
-		return token1, "float32"
+		return token1, NewPrimTypeDefinition("float32")
 	} else if len(suffix2) > 0 && suffix2[0] == '.' {
-		return token, "float64"
+		return token, NewPrimTypeDefinition("float64")
 	} else {
-		return token, "int32"
+		return token, NewPrimTypeDefinition("int32")
 	}
 }
