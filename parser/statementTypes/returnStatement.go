@@ -30,6 +30,6 @@ func (rs ReturnStatement) Parse(block string, nextBlockScanner *parser.ScanPeeke
 	return newReturnStatement(block)
 }
 
-func (ds *ReturnStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeName, error) {
+func (ds *ReturnStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, error) {
 	return expressionParsing.ToGoExpression(ds.block, fm)
 }

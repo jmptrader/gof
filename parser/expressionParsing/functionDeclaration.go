@@ -1,7 +1,5 @@
 package expressionParsing
 
-type TypeName string
-
 type FunctionDeclaration struct {
 	name       string
 	returnType TypeName
