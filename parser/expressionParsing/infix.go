@@ -14,10 +14,17 @@ func toInfix(opQueue []*blockSpec, fm FunctionMap, index int) (string, TypeDefin
 	if len(opQueue) <= index {
 		return opQueue[0].block, opQueue[0].valueType, nil
 	} else if fd := fm.GetFunction(opQueue[index].block); fd != nil {
-		arg := addTypeToNumber(opQueue[index-1])
+		argIndex := extractArgIndex(fd, opQueue, index)
+		arg := addTypeToNumber(opQueue[argIndex])
 		f := opQueue[index]
-		combined := combine(newBlockSpec(fmt.Sprintf("%s(%s)", fd.FuncName(), arg), f.valueType), opQueue[index+1:])
-		return toInfix(append(opQueue[:index-1], combined...), fm, index)
+		combined := combine2(opQueue[argIndex+1:index], newBlockSpec(fmt.Sprintf("%s(%s)", fd.FuncName(), arg), f.valueType), opQueue[index+1:])
+		return toInfix(append(opQueue[:argIndex], combined...), fm, argIndex)
+	} else if opQueue[index].valueType.IsFunc() {
+		argIndex := extractArgIndex(opQueue[index].valueType.(*FuncTypeDefinition), opQueue, index)
+		arg := addTypeToNumber(opQueue[argIndex])
+		f := opQueue[index]
+		combined := combine2(opQueue[argIndex+1:index], newBlockSpec(fmt.Sprintf("%s(%s)", f.block, arg), f.valueType.ReturnType()), opQueue[index+1:])
+		return toInfix(append(opQueue[:index-1], combined...), fm, argIndex)
 	} else if parser.IsOperator(opQueue[index].block) {
 		left := addTypeToNumber(opQueue[index-2])
 		right := addTypeToNumber(opQueue[index-1])
@@ -31,6 +38,19 @@ func toInfix(opQueue []*blockSpec, fm FunctionMap, index int) (string, TypeDefin
 	} else {
 		return toInfix(opQueue, fm, index+1)
 	}
+}
+
+func extractArgIndex(ft *FuncTypeDefinition, opQueue []*blockSpec, index int) int {
+	count := 1
+	fd := ft
+	for {
+		if !fd.ReturnType().IsFunc() {
+			break
+		}
+		count++
+		fd = fd.ReturnType().(*FuncTypeDefinition)
+	}
+	return index - count
 }
 
 func getValueType(ops []*blockSpec) (TypeDefinition, error) {
@@ -73,4 +93,12 @@ func addTypeToNumber(block *blockSpec) string {
 	default:
 		return block.block
 	}
+}
+
+func combine(x *blockSpec, y []*blockSpec) []*blockSpec {
+	return append([]*blockSpec{x}, y...)
+}
+
+func combine2(otherArgs []*blockSpec, newBlock *blockSpec, rest []*blockSpec) []*blockSpec {
+	return append(append(otherArgs, newBlock), rest...)
 }
