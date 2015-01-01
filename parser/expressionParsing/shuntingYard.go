@@ -14,7 +14,7 @@ func toRpn(line string, outputQueue []rpnValue, opStack []rpnValue, fm FunctionM
 	} else if token == "(" {
 		return toRpn(rest, outputQueue, append(opStack, newParenRpnValue()), fm)
 	} else if token == ")" {
-		return toRpnLeftParen(token, rest, outputQueue, opStack, fm)
+		return toRpnRightParen(token, rest, outputQueue, opStack, fm)
 	} else if fd := fm.GetFunction(token); fd != nil {
 		if fd.IsDefinition() {
 			return toRpn(rest, append(outputQueue, newPrimRpnValue(token)), opStack, fm)
@@ -38,7 +38,7 @@ func toRpnOperator(token, rest string, outputQueue []rpnValue, opStack []rpnValu
 		stackTop := opStack[len(opStack)-1]
 		if stackTop.operator && prec <= stackTop.prec {
 			opStack[len(opStack)-1] = op
-			return toRpn(rest, append(outputQueue, stackTop), opStack, fm)
+			return toRpnOperator(token, rest, append(outputQueue, stackTop), opStack[:len(opStack)-1], fm)
 		} else {
 			return toRpn(rest, outputQueue, append(opStack, op), fm)
 		}
@@ -47,7 +47,7 @@ func toRpnOperator(token, rest string, outputQueue []rpnValue, opStack []rpnValu
 	}
 }
 
-func toRpnLeftParen(token, rest string, outputQueue []rpnValue, opStack []rpnValue, fm FunctionMap) ([]string, error) {
+func toRpnRightParen(token, rest string, outputQueue []rpnValue, opStack []rpnValue, fm FunctionMap) ([]string, error) {
 	var i int
 	for i = len(opStack) - 1; !opStack[i].leftPar; i-- {
 		outputQueue = append(outputQueue, opStack[i])
@@ -71,8 +71,4 @@ func opPrec(op string) int {
 		return MultDiv
 	}
 	panic("Unknown op: '" + op + "'")
-}
-
-func combine(x *blockSpec, y []*blockSpec) []*blockSpec {
-	return append([]*blockSpec{x}, y...)
 }

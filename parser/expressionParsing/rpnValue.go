@@ -22,6 +22,7 @@ func newPrimRpnValue(token string) rpnValue {
 func newParenRpnValue() rpnValue {
 	return rpnValue{
 		leftPar: true,
+		token:   ")",
 	}
 }
 

@@ -71,14 +71,29 @@ var _ = Describe("ReturnStatement", func() {
 				Expect(genGo).To(Equal(fmt.Sprintf("((7+13)-(%s(5)/8))", name)))
 			})
 			It("Should generate the proper Go code with a curried function", func() {
-				code := "( 7 + 13 ) - a 5 / 8"
+				code := "( 7 + 13 ) - a 5 9 / 8"
 				r := statementParser.Parse(code, nil, factory)
 				fm := expressionParsing.NewFunctionMap()
-				name, _ := fm.AddFunction("a", expressionParsing.NewFuncTypeDefinition(intType, intType))
+				f1 := expressionParsing.NewFuncTypeDefinition(intType, intType)
+				f2 := expressionParsing.NewFuncTypeDefinition(intType, f1)
+				name, _ := fm.AddFunction("a", f2)
 				genGo, returnType, err := r.GenerateGo(fm)
 				Expect(err).To(BeNil())
 				Expect(returnType.Name()).To(BeEquivalentTo("int32"))
-				Expect(genGo).To(Equal(fmt.Sprintf("((7+13)-(%s(5)/8))", name)))
+				Expect(genGo).To(Equal(fmt.Sprintf("((7+13)-(%s(5)(9)/8))", name)))
+			})
+			It("Should generate the proper Go code with multiple functions", func() {
+				code := "( 7 + 13 ) - a 5 b 9 / 8"
+				r := statementParser.Parse(code, nil, factory)
+				fm := expressionParsing.NewFunctionMap()
+				f1 := expressionParsing.NewFuncTypeDefinition(intType, intType)
+				f2 := expressionParsing.NewFuncTypeDefinition(intType, f1)
+				nameA, _ := fm.AddFunction("a", f2)
+				nameB, _ := fm.AddFunction("b", f1)
+				genGo, returnType, err := r.GenerateGo(fm)
+				Expect(err).To(BeNil())
+				Expect(returnType.Name()).To(BeEquivalentTo("int32"))
+				Expect(genGo).To(Equal(fmt.Sprintf("((7+13)-(%s(5)(%s(9))/8))", nameA, nameB)))
 			})
 		})
 	})
