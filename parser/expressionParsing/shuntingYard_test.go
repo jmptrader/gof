@@ -22,8 +22,8 @@ var _ = Describe("ShuntingYard", func() {
 			exp := "( 5 + 9 ) * a 100 200 / 3 - 2"
 			fm := NewFunctionMap()
 			intType := NewPrimTypeDefinition("int32")
-			f1 := NewFuncTypeDefinition(intType, intType)
-			f2 := NewFuncTypeDefinition(intType, f1)
+			f1 := NewFuncTypeDefinition("", intType, intType)
+			f2 := NewFuncTypeDefinition("", intType, f1)
 			_, _ = fm.AddFunction("a", f2)
 			ops, err := ToRpn(exp, fm)
 			Expect(err).To(BeNil())

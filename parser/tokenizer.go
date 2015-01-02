@@ -36,6 +36,16 @@ func Lines(block string) []string {
 	return lines
 }
 
+func FromLines(lines []string) string {
+	ret := ""
+
+	for _, line := range lines {
+		ret += line + "\n"
+	}
+
+	return ret
+}
+
 func IsNumber(value string) bool {
 	return regNum.MatchString(value)
 }

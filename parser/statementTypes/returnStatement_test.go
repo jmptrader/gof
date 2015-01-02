@@ -54,7 +54,7 @@ var _ = Describe("ReturnStatement", func() {
 				code := "( 1 + 11 ) - a / 2"
 				r := statementParser.Parse(code, nil, factory)
 				fm := expressionParsing.NewFunctionMap()
-				name, _ := fm.AddFunction("a", expressionParsing.NewFuncTypeDefinition(nil, intType))
+				name, _ := fm.AddFunction("a", expressionParsing.NewFuncTypeDefinition("", nil, intType))
 				genGo, returnType, err := r.GenerateGo(fm)
 				Expect(err).To(BeNil())
 				Expect(returnType.Name()).To(BeEquivalentTo("int32"))
@@ -64,7 +64,7 @@ var _ = Describe("ReturnStatement", func() {
 				code := "( 7 + 13 ) - a 5 / 8"
 				r := statementParser.Parse(code, nil, factory)
 				fm := expressionParsing.NewFunctionMap()
-				name, _ := fm.AddFunction("a", expressionParsing.NewFuncTypeDefinition(intType, intType))
+				name, _ := fm.AddFunction("a", expressionParsing.NewFuncTypeDefinition("", intType, intType))
 				genGo, returnType, err := r.GenerateGo(fm)
 				Expect(err).To(BeNil())
 				Expect(returnType.Name()).To(BeEquivalentTo("int32"))
@@ -74,8 +74,8 @@ var _ = Describe("ReturnStatement", func() {
 				code := "( 7 + 13 ) - a 5 9 / 8"
 				r := statementParser.Parse(code, nil, factory)
 				fm := expressionParsing.NewFunctionMap()
-				f1 := expressionParsing.NewFuncTypeDefinition(intType, intType)
-				f2 := expressionParsing.NewFuncTypeDefinition(intType, f1)
+				f1 := expressionParsing.NewFuncTypeDefinition("", intType, intType)
+				f2 := expressionParsing.NewFuncTypeDefinition("", intType, f1)
 				name, _ := fm.AddFunction("a", f2)
 				genGo, returnType, err := r.GenerateGo(fm)
 				Expect(err).To(BeNil())
@@ -86,8 +86,8 @@ var _ = Describe("ReturnStatement", func() {
 				code := "( 7 + 13 ) - a 5 b 9 / 8"
 				r := statementParser.Parse(code, nil, factory)
 				fm := expressionParsing.NewFunctionMap()
-				f1 := expressionParsing.NewFuncTypeDefinition(intType, intType)
-				f2 := expressionParsing.NewFuncTypeDefinition(intType, f1)
+				f1 := expressionParsing.NewFuncTypeDefinition("", intType, intType)
+				f2 := expressionParsing.NewFuncTypeDefinition("", intType, f1)
 				nameA, _ := fm.AddFunction("a", f2)
 				nameB, _ := fm.AddFunction("b", f1)
 				genGo, returnType, err := r.GenerateGo(fm)
@@ -99,8 +99,8 @@ var _ = Describe("ReturnStatement", func() {
 				code := "( 7 + 13 ) - c ( a 5 b 9 / 8 ) 10"
 				r := statementParser.Parse(code, nil, factory)
 				fm := expressionParsing.NewFunctionMap()
-				f1 := expressionParsing.NewFuncTypeDefinition(intType, intType)
-				f2 := expressionParsing.NewFuncTypeDefinition(intType, f1)
+				f1 := expressionParsing.NewFuncTypeDefinition("", intType, intType)
+				f2 := expressionParsing.NewFuncTypeDefinition("", intType, f1)
 				nameA, _ := fm.AddFunction("a", f2)
 				nameB, _ := fm.AddFunction("b", f1)
 				nameC, _ := fm.AddFunction("c", f2)

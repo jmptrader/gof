@@ -12,7 +12,7 @@ var _ = Describe("FunctionMap", func() {
 		It("Should return incrementing values", func() {
 			fm := NewFunctionMap()
 			intType := NewPrimTypeDefinition("int32")
-			fi := NewFuncTypeDefinition(intType, intType)
+			fi := NewFuncTypeDefinition("", intType, intType)
 			a, err := fm.AddFunction("a", fi)
 			Expect(err).To(BeNil())
 			b, err := fm.AddFunction("b", fi)
@@ -35,7 +35,7 @@ var _ = Describe("FunctionMap", func() {
 		It("Should return an error when add the same function name", func() {
 			fm := NewFunctionMap()
 			intType := NewPrimTypeDefinition("int32")
-			fi := NewFuncTypeDefinition(intType, intType)
+			fi := NewFuncTypeDefinition("", intType, intType)
 
 			_, err := fm.AddFunction("a", fi)
 			Expect(err).To(BeNil())
