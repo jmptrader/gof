@@ -19,10 +19,10 @@ The intention of the language is to allow you to write strongly typed functional
 
 ===
 
-Lambdas
+Functions
 =======
 
-Lambdas are the only way to define a function or method:
+Functions have a simple syntax:
 
 ```
 func fibonacci -> n int -> int
@@ -34,16 +34,16 @@ func fibonacci -> n int -> int
 ```  
 
   This example actually demonstrates a few things:
-  + Lambdas (`func` + `->` syntax)
+  + Function Currying
   + Pattern Matching (`match` keyword)
   + Tabs over brackets
   + Lack of `return` keyword
-  + Tail Recursion
+  + Tail Recursion (not yet implemented)
   
-  Important requirements of a Lambda:
-  + First token is the name of the lambda. (Use `_` if the name isn't used)
+  Important requirements of a function:
+  + First token is the name of the function.
   + Last token is the return type. (Use `unit` if there isn't one)
-  + A type in a function declaration has to have a name assigned to it.
+  + An argument in a function declaration has to have a name assigned to it (e.g. `n`).
 
 Generics
 ========
