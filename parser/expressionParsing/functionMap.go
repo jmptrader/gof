@@ -7,26 +7,26 @@ import (
 
 type funcMap struct {
 	prevScope FunctionMap
-	fm        map[string]*FuncTypeDefinition
+	fm        map[string]FuncTypeDefinition
 	count     int
 }
 
 func NewFunctionMap() FunctionMap {
 	return &funcMap{
-		fm: make(map[string]*FuncTypeDefinition),
+		fm: make(map[string]FuncTypeDefinition),
 	}
 }
 
 func newFunctionMap(prevScope FunctionMap) FunctionMap {
 	return &funcMap{
-		fm:        make(map[string]*FuncTypeDefinition),
+		fm:        make(map[string]FuncTypeDefinition),
 		prevScope: prevScope,
 	}
 }
 
 func (fm *funcMap) GetFunction(name string) *FuncTypeDefinition {
 	if d, ok := fm.fm[name]; ok {
-		return d
+		return &d
 	} else if fm.prevScope != nil {
 		return fm.prevScope.GetFunction(name)
 	}
@@ -38,9 +38,10 @@ func (fm *funcMap) AddFunction(name string, f *FuncTypeDefinition) (string, erro
 		return "", errors.New("The function name'" + name + "' is already allocated.")
 	}
 
-	fm.fm[name] = f
+	cloned := *f
 	genName := fm.getNextFunctionName()
-	f.name = genName
+	cloned.name = genName
+	fm.fm[name] = cloned
 
 	return genName, nil
 }
