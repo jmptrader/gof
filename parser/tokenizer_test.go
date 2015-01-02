@@ -29,6 +29,13 @@ var _ = Describe("Parser", func() {
 			Expect(lines).To(Equal([]string{"a", "b", "c"}))
 		})
 	})
+	Context("FromLines", func() {
+		It("Should combine the lines into a block", func() {
+			lines := []string{"a", "b", "c"}
+			block := FromLines(lines)
+			Expect(block).To(Equal("a\nb\nc\n"))
+		})
+	})
 	Context("IsNumber", func() {
 		It("Should be distinguish a float or int", func() {
 			i := "324"

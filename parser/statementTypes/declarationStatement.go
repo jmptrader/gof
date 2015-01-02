@@ -73,7 +73,7 @@ func (ds *DeclarationStatement) GenerateGo(fm expressionParsing.FunctionMap) (st
 		return "", nil, err
 	}
 
-	fd := expressionParsing.NewFuncTypeDefinition(nil, returnType)
+	fd := expressionParsing.NewFuncTypeDefinition("", nil, returnType)
 	name, err := fm.AddFunction(ds.varName, fd)
 
 	genCode := fmt.Sprintf("var %s func() %s\n%s = func(){\n\treturn %s\n}", name, returnType.Name(), name, innerCode)
