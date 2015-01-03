@@ -10,7 +10,7 @@ import (
 var _ = Describe("Parser", func() {
 	Context("Tokenize", func() {
 		It("Should split up a line based on whitespace", func() {
-			code := "a b c"
+			code := "\ta b c"
 			a, rest := Tokenize(code)
 			Expect(a).To(Equal("a"))
 			Expect(rest).To(Equal("b c"))
