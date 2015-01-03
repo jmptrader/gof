@@ -22,6 +22,9 @@ func init() {
 func Tokenize(line string) (string, string) {
 	values := regToken.Split(line, 2)
 	if len(values) == 2 {
+		if len(values[0]) == 0 {
+			return Tokenize(values[1])
+		}
 		return values[0], values[1]
 	}
 	return values[0], ""
