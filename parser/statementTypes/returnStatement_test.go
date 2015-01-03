@@ -60,6 +60,18 @@ var _ = Describe("ReturnStatement", func() {
 				Expect(returnType.Name()).To(BeEquivalentTo("int32"))
 				Expect(genGo).To(Equal(fmt.Sprintf("((1+11)-(%s()/2))", name)))
 			})
+			It("Should generate the proper Go code with definitions", func() {
+				code := "a + b + c"
+				r := statementParser.Parse(code, nil, factory)
+				fm := expressionParsing.NewFunctionMap()
+				nameA, _ := fm.AddFunction("a", expressionParsing.NewFuncTypeDefinition("", nil, intType))
+				nameB, _ := fm.AddFunction("b", expressionParsing.NewFuncTypeDefinition("", nil, intType))
+				nameC, _ := fm.AddFunction("c", expressionParsing.NewFuncTypeDefinition("", nil, intType))
+				genGo, returnType, err := r.GenerateGo(fm)
+				Expect(err).To(BeNil())
+				Expect(returnType.Name()).To(BeEquivalentTo("int32"))
+				Expect(genGo).To(Equal(fmt.Sprintf("((%s()+%s())+%s())", nameA, nameB, nameC)))
+			})
 			It("Should generate the proper Go code with a function", func() {
 				code := "( 7 + 13 ) - a 5 / 8"
 				r := statementParser.Parse(code, nil, factory)
