@@ -45,12 +45,13 @@ func (bs *BlockScanner) Scan() bool {
 			bs.prevLine = ""
 		} else {
 			bs.prevLine = bs.getLineFromScanner()
+			enteredBlock = false
 			return true
 		}
 	}
 
 	bs.err = bs.scanner.Err()
-	return false
+	return enteredBlock
 }
 
 func (bs *BlockScanner) getLineFromScanner() string {
