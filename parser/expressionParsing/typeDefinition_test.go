@@ -12,8 +12,8 @@ var _ = Describe("TypeDefinition", func() {
 		It("Should list arguments and return type", func() {
 			i := NewPrimTypeDefinition("int32")
 			u := NewPrimTypeDefinition("uint32")
-			f := NewFuncTypeDefinition("", i, u)
-			Expect(f.Name()).To(BeEquivalentTo("int32->uint32"))
+			f := NewFuncTypeDefinition("a", i, u)
+			Expect(f.Name()).To(BeEquivalentTo("a int32->uint32"))
 		})
 	})
 	Context("ParseFuncTypeDefinition", func() {

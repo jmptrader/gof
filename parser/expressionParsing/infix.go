@@ -58,7 +58,7 @@ func getValueType(ops []*blockSpec) (TypeDefinition, error) {
 	right := ops[1].valueType
 
 	if left != right {
-		return nil, errors.New(fmt.Sprintf("Illegal to %s%s%s", left, right, ops[2]))
+		return nil, errors.New(fmt.Sprintf("Illegal to %s%s%s", left.Name(), ops[2].block, right.Name()))
 	}
 
 	return left, nil

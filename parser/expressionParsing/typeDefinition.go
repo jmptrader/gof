@@ -111,7 +111,7 @@ func (f *FuncTypeDefinition) FuncName() string {
 }
 
 func (f *FuncTypeDefinition) Name() TypeName {
-	return TypeName(fmt.Sprintf("%s->%s", f.Argument.Name(), f.returnType.Name()))
+	return TypeName(fmt.Sprintf("%s %s->%s", f.ArgumentName, f.Argument.Name(), f.returnType.Name()))
 }
 
 func (f PrimTypeDefinition) IsFunc() bool {
