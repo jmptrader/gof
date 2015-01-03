@@ -42,6 +42,7 @@ func (sp *ScanPeeker) Read() (bool, string) {
 	}()
 
 	if sp.readPeeked {
+		sp.readPeeked = false
 		return true, sp.peeked
 	}
 
@@ -50,5 +51,5 @@ func (sp *ScanPeeker) Read() (bool, string) {
 	}
 
 	sp.scanCheck = sp.scanner.Scan()
-	return sp.scanner.Err() == nil, sp.scanner.Text()
+	return sp.scanCheck && sp.scanner.Err() == nil, sp.scanner.Text()
 }

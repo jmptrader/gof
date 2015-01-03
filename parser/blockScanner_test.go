@@ -10,6 +10,14 @@ import (
 
 var _ = Describe("BlockScanner", func() {
 	Context("No pre reader", func() {
+		It("Should return a single block", func() {
+			code := "match\n\tblah\n\tblah"
+			scanner := NewBlockScanner(strings.NewReader(code), nopPre)
+
+			Expect(scanner.Scan()).To(BeTrue())
+			Expect(scanner.Err()).To(BeNil())
+			Expect(scanner.Text()).To(Equal("match\n\tblah\n\tblah"))
+		})
 		It("Should break up the blocks", func() {
 			code := "func a -> b int -> int\n\tb + 9\n\nfunc b -> c int -> int\n\t c - 4\n\n"
 			scanner := NewBlockScanner(strings.NewReader(code), nopPre)
@@ -35,7 +43,7 @@ var _ = Describe("BlockScanner", func() {
 			Expect(scanner.Err()).To(BeNil())
 			Expect(scanner.Text()).To(Equal("if a == 4\n\tif b > 3\n\t\t5\n\telse\n\t\t6"))
 
-			Expect(scanner.Scan()).To(BeFalse())
+			Expect(scanner.Scan()).To(BeTrue())
 			Expect(scanner.Err()).To(BeNil())
 			Expect(scanner.Text()).To(Equal("else\n\t9"))
 		})
