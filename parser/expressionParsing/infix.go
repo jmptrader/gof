@@ -1,16 +1,15 @@
 package expressionParsing
 
 import (
-	"errors"
 	"fmt"
 	"github.com/apoydence/GoF/parser"
 )
 
-func ToInfix(opQueue []string, fm FunctionMap) (string, TypeDefinition, error) {
+func ToInfix(opQueue []string, fm FunctionMap) (string, TypeDefinition, parser.SyntaxError) {
 	return toInfix(toBlockSpec(opQueue, fm), fm, 0)
 }
 
-func toInfix(opQueue []*blockSpec, fm FunctionMap, index int) (string, TypeDefinition, error) {
+func toInfix(opQueue []*blockSpec, fm FunctionMap, index int) (string, TypeDefinition, parser.SyntaxError) {
 	if len(opQueue) <= index {
 		return opQueue[0].block, opQueue[0].valueType, nil
 	} else if fd := fm.GetFunction(opQueue[index].block); fd != nil && fd.IsFunc() {
@@ -54,12 +53,12 @@ func extractArgIndex(ft FuncTypeDefinition, opQueue []*blockSpec, index int) int
 	return index - count
 }
 
-func getValueType(ops []*blockSpec) (TypeDefinition, error) {
+func getValueType(ops []*blockSpec) (TypeDefinition, parser.SyntaxError) {
 	left := ops[0].valueType
 	right := ops[1].valueType
 
 	if left != right {
-		return nil, errors.New(fmt.Sprintf("Illegal to %s%s%s", left.Name(), ops[2].block, right.Name()))
+		return nil, parser.NewSyntaxError(fmt.Sprintf("Illegal to %s%s%s", left.Name(), ops[2].block, right.Name()), 0, 0)
 	}
 
 	return left, nil
