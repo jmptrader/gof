@@ -80,8 +80,8 @@ NOTE: The suffix IS case sensitive. Meaning a `3UI` is invalid.
 Lambdas
 =======
 
+=======
 Functions have a simple syntax:
-
 ```
 func fibonacci -> n int -> int
   func subFib -> a int -> b int -> n int-> int
