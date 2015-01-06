@@ -13,14 +13,15 @@ func ToInfix(opQueue []string, fm FunctionMap) (string, TypeDefinition, error) {
 func toInfix(opQueue []*blockSpec, fm FunctionMap, index int) (string, TypeDefinition, error) {
 	if len(opQueue) <= index {
 		return opQueue[0].block, opQueue[0].valueType, nil
-	} else if fd := fm.GetFunction(opQueue[index].block); fd != nil {
-		argIndex := extractArgIndex(fd, opQueue, index)
+	} else if fd := fm.GetFunction(opQueue[index].block); fd != nil && fd.IsFunc() {
+		ftd := fd.(FuncTypeDefinition)
+		argIndex := extractArgIndex(ftd, opQueue, index)
 		arg := addTypeToNumber(opQueue[argIndex])
 		f := opQueue[index]
-		combined := combine2(opQueue[argIndex+1:index], newBlockSpec(fmt.Sprintf("%s(%s)", fd.FuncName(), arg), f.valueType), opQueue[index+1:])
+		combined := combine2(opQueue[argIndex+1:index], newBlockSpec(fmt.Sprintf("%s(%s)", ftd.FuncName(), arg), f.valueType), opQueue[index+1:])
 		return toInfix(append(opQueue[:argIndex], combined...), fm, argIndex)
 	} else if opQueue[index].valueType.IsFunc() {
-		argIndex := extractArgIndex(opQueue[index].valueType.(*FuncTypeDefinition), opQueue, index)
+		argIndex := extractArgIndex(opQueue[index].valueType.(FuncTypeDefinition), opQueue, index)
 		arg := addTypeToNumber(opQueue[argIndex])
 		f := opQueue[index]
 		combined := combine2(opQueue[argIndex+1:index], newBlockSpec(fmt.Sprintf("%s(%s)", f.block, arg), f.valueType.ReturnType()), opQueue[index+1:])
@@ -40,7 +41,7 @@ func toInfix(opQueue []*blockSpec, fm FunctionMap, index int) (string, TypeDefin
 	}
 }
 
-func extractArgIndex(ft *FuncTypeDefinition, opQueue []*blockSpec, index int) int {
+func extractArgIndex(ft FuncTypeDefinition, opQueue []*blockSpec, index int) int {
 	count := 1
 	fd := ft
 	for {
@@ -48,7 +49,7 @@ func extractArgIndex(ft *FuncTypeDefinition, opQueue []*blockSpec, index int) in
 			break
 		}
 		count++
-		fd = fd.ReturnType().(*FuncTypeDefinition)
+		fd = fd.ReturnType().(FuncTypeDefinition)
 	}
 	return index - count
 }

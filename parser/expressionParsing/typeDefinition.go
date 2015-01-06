@@ -22,31 +22,39 @@ type TypeDefinition interface {
 	Name() TypeName
 }
 
-type FuncTypeDefinition struct {
-	Argument     TypeDefinition
+type FuncTypeDefinition interface {
+	TypeDefinition
+	Argument() TypeDefinition
+	ArgumentName() string
+	FuncName() string
+	IsDefinition() bool
+}
+
+type funcTypeDefinition struct {
+	argument     TypeDefinition
 	returnType   TypeDefinition
 	name         string
-	ArgumentName string
+	argumentName string
 }
 
 type PrimTypeDefinition struct {
 	name TypeName
 }
 
-func NewFuncTypeDefinition(argName string, arg, retType TypeDefinition) *FuncTypeDefinition {
-	return &FuncTypeDefinition{
-		Argument:     arg,
+func NewFuncTypeDefinition(argName string, arg, retType TypeDefinition) FuncTypeDefinition {
+	return &funcTypeDefinition{
+		argument:     arg,
 		returnType:   retType,
-		ArgumentName: argName,
+		argumentName: argName,
 	}
 }
 
-func ParseFuncTypeDefinition(str string) (*FuncTypeDefinition, error) {
+func ParseFuncTypeDefinition(str string) (FuncTypeDefinition, error) {
 	args, ret, err := fetchTypes(str)
 	if err != nil {
 		return nil, err
 	}
-	return convertToTypeDef(args, ret, 0).(*FuncTypeDefinition), nil
+	return convertToTypeDef(args, ret, 0).(FuncTypeDefinition), nil
 }
 
 func convertToTypeDef(args []argDesc, retType TypeName, index int) TypeDefinition {
@@ -94,24 +102,32 @@ func NewPrimTypeDefinition(name TypeName) TypeDefinition {
 	}
 }
 
-func (f *FuncTypeDefinition) IsFunc() bool {
+func (f *funcTypeDefinition) Argument() TypeDefinition {
+	return f.argument
+}
+
+func (f *funcTypeDefinition) ArgumentName() string {
+	return f.argumentName
+}
+
+func (f *funcTypeDefinition) IsFunc() bool {
 	return true
 }
 
-func (f *FuncTypeDefinition) IsDefinition() bool {
-	return f.Argument == nil
+func (f *funcTypeDefinition) IsDefinition() bool {
+	return f.argument == nil
 }
 
-func (f *FuncTypeDefinition) ReturnType() TypeDefinition {
+func (f *funcTypeDefinition) ReturnType() TypeDefinition {
 	return f.returnType
 }
 
-func (f *FuncTypeDefinition) FuncName() string {
+func (f *funcTypeDefinition) FuncName() string {
 	return f.name
 }
 
-func (f *FuncTypeDefinition) Name() TypeName {
-	return TypeName(fmt.Sprintf("%s %s->%s", f.ArgumentName, f.Argument.Name(), f.returnType.Name()))
+func (f *funcTypeDefinition) Name() TypeName {
+	return TypeName(fmt.Sprintf("%s %s->%s", f.ArgumentName(), f.Argument().Name(), f.returnType.Name()))
 }
 
 func (f PrimTypeDefinition) IsFunc() bool {

@@ -1,8 +1,8 @@
 package expressionParsing
 
 type FunctionMap interface {
-	GetFunction(name string) *FuncTypeDefinition
-	AddFunction(name string, f *FuncTypeDefinition) (string, error)
+	GetFunction(name string) TypeDefinition
+	AddFunction(name string, f TypeDefinition) (string, error)
 	NextScopeLayer() FunctionMap
 }
 

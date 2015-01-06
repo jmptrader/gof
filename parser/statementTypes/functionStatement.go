@@ -23,7 +23,7 @@ func NewFunctionStatementParser() StatementParser {
 	return FunctionStatement{}
 }
 
-func newFunctionStatement(name string, typeDef *expressionParsing.FuncTypeDefinition, inner []Statement) Statement {
+func newFunctionStatement(name string, typeDef expressionParsing.FuncTypeDefinition, inner []Statement) Statement {
 	return &FunctionStatement{
 		FuncName:        name,
 		TypeDef:         typeDef,
@@ -82,8 +82,10 @@ func fetchParts(code string) (string, string, bool) {
 }
 
 func (fs *FunctionStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, error) {
-	setupFuncMap(fm, fs.TypeDef.(*expressionParsing.FuncTypeDefinition))
-	inner, err := generateInnerGo(fm, fs.InnerStatements)
+	fm.AddFunction(fs.FuncName, fs.TypeDef)
+	innerScope := fm.NextScopeLayer()
+	setupFuncMap(innerScope, fs.TypeDef.(expressionParsing.FuncTypeDefinition))
+	inner, err := generateInnerGo(innerScope, fs.InnerStatements)
 	if err != nil {
 		return "", nil, err
 	}
@@ -103,12 +105,12 @@ func generateInnerGo(fm expressionParsing.FunctionMap, statements []Statement) (
 	return code, nil
 }
 
-func setupFuncMap(fm expressionParsing.FunctionMap, typeDef *expressionParsing.FuncTypeDefinition) {
-	if ft, ok := typeDef.ReturnType().(*expressionParsing.FuncTypeDefinition); ok {
+func setupFuncMap(fm expressionParsing.FunctionMap, typeDef expressionParsing.FuncTypeDefinition) {
+	if ft, ok := typeDef.ReturnType().(expressionParsing.FuncTypeDefinition); ok {
 		setupFuncMap(fm, ft)
 	}
-	newFt := expressionParsing.NewFuncTypeDefinition("", nil, typeDef.Argument)
-	fm.AddFunction(typeDef.ArgumentName, newFt)
+	newFt := expressionParsing.NewPrimTypeDefinition(typeDef.Argument().Name())
+	fm.AddFunction(typeDef.ArgumentName(), newFt)
 }
 
 func generateInnerFunc(typeDef expressionParsing.TypeDefinition, tabCount int, innerStatements []string) string {
@@ -128,8 +130,8 @@ func generateInnerFunc(typeDef expressionParsing.TypeDefinition, tabCount int, i
 }
 
 func generateTypeDef(first bool, typeDef expressionParsing.TypeDefinition) string {
-	if ftd, ok := typeDef.(*expressionParsing.FuncTypeDefinition); ok {
-		s := fmt.Sprintf("(%s %s) %s", ftd.ArgumentName, ftd.Argument.Name(), generateTypeDef(false, ftd.ReturnType()))
+	if ftd, ok := typeDef.(expressionParsing.FuncTypeDefinition); ok {
+		s := fmt.Sprintf("(%s %s) %s", ftd.ArgumentName(), ftd.Argument().Name(), generateTypeDef(false, ftd.ReturnType()))
 		if !first {
 			return "func " + s
 		}
