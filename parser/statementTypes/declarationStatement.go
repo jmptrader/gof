@@ -2,8 +2,8 @@ package statementTypes
 
 import (
 	"fmt"
-	"github.com/apoydence/GoF/parser"
-	"github.com/apoydence/GoF/parser/expressionParsing"
+	"github.com/apoydence/gof/parser"
+	"github.com/apoydence/gof/parser/expressionParsing"
 )
 
 type DeclarationStatement struct {

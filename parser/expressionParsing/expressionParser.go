@@ -1,6 +1,6 @@
 package expressionParsing
 
-import "github.com/apoydence/GoF/parser"
+import "github.com/apoydence/gof/parser"
 
 type FunctionMap interface {
 	GetFunction(name string) TypeDefinition

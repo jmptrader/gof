@@ -1,8 +1,8 @@
 package statementTypes
 
 import (
-	"github.com/apoydence/GoF/parser"
-	"github.com/apoydence/GoF/parser/expressionParsing"
+	"github.com/apoydence/gof/parser"
+	"github.com/apoydence/gof/parser/expressionParsing"
 )
 
 type ReturnStatement struct {

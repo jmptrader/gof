@@ -2,8 +2,8 @@ package statementTypes_test
 
 import (
 	"fmt"
-	"github.com/apoydence/GoF/parser/expressionParsing"
-	. "github.com/apoydence/GoF/parser/statementTypes"
+	"github.com/apoydence/gof/parser/expressionParsing"
+	. "github.com/apoydence/gof/parser/statementTypes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
