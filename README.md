@@ -1,7 +1,7 @@
 GoF
 ===
 
-A Functional programming language that compiles down to Go.  Currently GoF is nothing more than a set of ideas.
+A Functional programming language that compiles down to Go.  Currently GoF is nothing more than a set of ideas.  
 
 If you have some that you would like to share, please feel free!  GoF is intended to be what Go hasn't for coders, so if you seem a feature that would fit, speak up!
 
@@ -48,41 +48,6 @@ NOTE: The suffix IS case sensitive. Meaning a `3UI` is invalid.
 To denote a hex value, prefix the number with a `0x`. For octal, prefix the value with a `0`.  This is the same as Go.
 
 ####Functions
-=======
-Functions
-=======
-Language Details
-================
-
-####Spaces vs. Tabs
-
-GoF uses tabs instead of spaces to match what `go fmt` enforces.  Even though `go fmt` won't work with GoF code, the convention is still adhered to.
-
-####Numeric Constants
-
-GoF is strict with types, so it picking the correct numeric type is important.  Like many languages, use a suffix to tell the compiler which numeric type was intended.
-
-Type    | Suffix
-----    | ------
-int8    | b
-uint8   | ub
-int16   | h
-uint16  | uh
-int32   | (default)
-uint32  | ui
-int64   | l
-uint64  | ul
-float32 | f
-float64 | (default with .0)
-
-NOTE: The suffix IS case sensitive. Meaning a `3UI` is invalid.
-
-Lambdas
-=======
-
-=======
-Functions have a simple syntax:
-=======
 
 ```
 func fibonacci -> n int -> int
@@ -91,7 +56,7 @@ func fibonacci -> n int -> int
       0,1,2 -> a
       n     -> subFib a+b a n-1
   subFib n
-```
+```  
 
   This example actually demonstrates a few things:
   + Lambdas (`func` + `->` syntax)
@@ -99,7 +64,7 @@ func fibonacci -> n int -> int
   + Tabs over brackets
   + Lack of `return` keyword
   + Tail Recursion
-
+  
   Important requirements of a Lambda:
   + First token is the name of the lambda. (Use `_` if the name isn't used)
   + Last token is the return type. (Use `unit` if there isn't one)
@@ -112,7 +77,7 @@ Generics are not defined explicitly, but by leaving type information out for the
 ```
 func double -> a' -> a'
   a + a
-
+  
 double 2 // Results in 4
 ```
 
@@ -121,7 +86,7 @@ The only requirement is that whatever type `a` turns out to be, has the `+` oper
 ```
 func encode -> a' -> b' -> b`
   a.encode b
-```
+```  
 
 This function will take two parameters (`a` and `b`) where the type `a` has a method `encode` that takes type `b`.  The method `encode` will have to return the type `b`
 
@@ -170,7 +135,7 @@ Functions can be partially called:
 ```
 func add -> a int -> b int-> int
   a + b
-
+  
 x = add 1 // x is now a func -> a int -> int
 y = x 2 // y is now 3
 ```
