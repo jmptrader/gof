@@ -31,40 +31,48 @@ func newFunctionStatement(name string, typeDef expressionParsing.FuncTypeDefinit
 	}
 }
 
-func (fs FunctionStatement) Parse(block string, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) Statement {
+func (fs FunctionStatement) Parse(block string, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) (Statement, parser.SyntaxError) {
 	lines := parser.Lines(block)
 	name, typeDefStr, ok := fetchParts(lines[0])
 	if !ok {
-		return nil
+		return nil, nil
 	}
 
 	typeDef, err := expressionParsing.ParseFuncTypeDefinition(typeDefStr)
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	innerStatements := fetchInnerStatements(lines[1:], factory)
+
+	innerStatements, err := fetchInnerStatements(lines[1:], factory)
+	if err != nil {
+		return nil, err
+	}
 
 	// CHECK TO SEE IF THE LAST STATEMENT IS A DECLARATION
 
-	return newFunctionStatement(name, typeDef, innerStatements)
+	return newFunctionStatement(name, typeDef, innerStatements), nil
 }
 
-func fetchInnerStatements(lines []string, factory *StatementFactory) []Statement {
+func fetchInnerStatements(lines []string, factory *StatementFactory) ([]Statement, parser.SyntaxError) {
 	scanner := parser.NewScanPeekerStr(parser.FromLines(lines))
 	statements := make([]Statement, 0)
-	next := func() Statement {
+	next := func() (Statement, parser.SyntaxError) {
 		return factory.Read(scanner)
 	}
 
 	return subFetchInnerStatements(next, statements)
 }
 
-func subFetchInnerStatements(next func() Statement, statements []Statement) []Statement {
-	if s := next(); s != nil {
+func subFetchInnerStatements(next func() (Statement, parser.SyntaxError), statements []Statement) ([]Statement, parser.SyntaxError) {
+
+	s, err := next()
+	if err != nil {
+		return nil, err
+	} else if s != nil {
 		return subFetchInnerStatements(next, append(statements, s))
 	}
 
-	return statements
+	return statements, nil
 }
 
 func fetchParts(code string) (string, string, bool) {

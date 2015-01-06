@@ -1,8 +1,8 @@
 package expressionParsing
 
 import (
-	"errors"
 	"fmt"
+	"github.com/apoydence/GoF/parser"
 	"regexp"
 )
 
@@ -49,7 +49,7 @@ func NewFuncTypeDefinition(argName string, arg, retType TypeDefinition) FuncType
 	}
 }
 
-func ParseFuncTypeDefinition(str string) (FuncTypeDefinition, error) {
+func ParseFuncTypeDefinition(str string) (FuncTypeDefinition, parser.SyntaxError) {
 	args, ret, err := fetchTypes(str)
 	if err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ type argDesc struct {
 	typeName TypeName
 }
 
-func fetchTypes(code string) ([]argDesc, TypeName, error) {
+func fetchTypes(code string) ([]argDesc, TypeName, parser.SyntaxError) {
 	args := make([]argDesc, 0)
 	groupIndex := make(map[string]int)
 	for i, name := range funcArgTypeRegexp.SubexpNames() {
@@ -86,7 +86,7 @@ func fetchTypes(code string) ([]argDesc, TypeName, error) {
 		name := m[groupIndex["argName"]]
 		typeName := m[groupIndex["argType"]]
 		if _, ok := argsM[name]; ok {
-			return nil, "", errors.New(fmt.Sprintf("The argument name '%s' is used multiple times", name))
+			return nil, "", parser.NewSyntaxError(fmt.Sprintf("The argument name '%s' is used multiple times", name), 0, 0)
 		}
 
 		argsM[name] = typeName

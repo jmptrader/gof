@@ -26,8 +26,8 @@ func (rs *ReturnStatement) OutputQueue() []string {
 	return rs.outputQueue
 }
 
-func (rs ReturnStatement) Parse(block string, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) Statement {
-	return newReturnStatement(block)
+func (rs ReturnStatement) Parse(block string, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) (Statement, parser.SyntaxError) {
+	return newReturnStatement(block), nil
 }
 
 func (ds *ReturnStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, parser.SyntaxError) {

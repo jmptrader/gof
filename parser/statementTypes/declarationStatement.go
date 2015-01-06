@@ -24,7 +24,7 @@ func newDeclarationStatement(varName, code string, innerStatement Statement) Sta
 	}
 }
 
-func (ds DeclarationStatement) Parse(block string, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) Statement {
+func (ds DeclarationStatement) Parse(block string, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) (Statement, parser.SyntaxError) {
 	lines := parser.Lines(block)
 
 	ok, varName, restOfLine := splitEquals(lines[0])
@@ -32,10 +32,14 @@ func (ds DeclarationStatement) Parse(block string, nextBlockScanner *parser.Scan
 	if ok {
 		combinedLine := combineBlock(restOfLine, lines[1:])
 		peeker := parser.NewScanPeekerStr(combinedLine)
-		return newDeclarationStatement(varName, combinedLine, factory.Read(peeker))
+		st, err := factory.Read(peeker)
+		if err != nil {
+			return nil, err
+		}
+		return newDeclarationStatement(varName, combinedLine, st), nil
 	}
 
-	return nil
+	return nil, nil
 }
 
 func splitEquals(line string) (bool, string, string) {
