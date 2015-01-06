@@ -31,6 +31,7 @@ func generateCmd() {
 		info, err := os.Stat(p)
 		if err != nil || !info.IsDir() {
 			fmt.Printf("Unable to open %s\n", p)
+			os.Exit(1)
 		}
 	}
 

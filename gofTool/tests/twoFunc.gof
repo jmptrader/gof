@@ -1,5 +1,5 @@
 func mult -> a int32 -> b int32 -> int32
 	a * b
 
-func action -> a int32 -> b int32 -> c int32 -> int32
+func Action -> a int32 -> b int32 -> c int32 -> int32
 	mult a b + c

@@ -13,22 +13,27 @@ func GofToGo(reader io.Reader, writer io.Writer) error {
 	factory := statementTypes.NewStatementFactory(fetchStatementParsers()...)
 	funcMap := expressionParsing.NewFunctionMap()
 
-	io.WriteString(writer, "package gof\n\n")
+	io.WriteString(writer, "package tests\n\n")
 
 	return writeGeneratedBlocks(factory, bp, funcMap, writer)
 }
 
-func writeGeneratedBlocks(factory *statementTypes.StatementFactory, peeker *parser.ScanPeeker, fm expressionParsing.FunctionMap, writer io.Writer) error {
-	if s := factory.Read(peeker); s != nil {
-		code, _, err := s.GenerateGo(fm)
-		if err != nil {
-			return err
+func writeGeneratedBlocks(factory *statementTypes.StatementFactory, peeker *parser.ScanPeeker, fm expressionParsing.FunctionMap, writer io.Writer) parser.SyntaxError {
+	s, synErr := factory.Read(peeker)
+	if synErr != nil {
+		return synErr
+	}
+
+	if s != nil {
+		code, _, synErr := s.GenerateGo(fm)
+		if synErr != nil {
+			return synErr
 		}
 
-		_, err = io.WriteString(writer, code)
+		_, err := io.WriteString(writer, code+"\n\n")
 
 		if err != nil {
-			return err
+			return parser.NewSyntaxError(err.Error(), 0, 0)
 		}
 		return writeGeneratedBlocks(factory, peeker, fm, writer)
 	}
