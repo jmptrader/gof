@@ -1,7 +1,7 @@
 package expressionParsing
 
 import (
-	"github.com/apoydence/GoF/parser"
+	"github.com/apoydence/gof/parser"
 )
 
 func toRpn(line string, outputQueue []rpnValue, opStack []rpnValue, fm FunctionMap) ([]string, parser.SyntaxError) {

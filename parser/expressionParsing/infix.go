@@ -2,7 +2,7 @@ package expressionParsing
 
 import (
 	"fmt"
-	"github.com/apoydence/GoF/parser"
+	"github.com/apoydence/gof/parser"
 )
 
 func ToInfix(opQueue []string, fm FunctionMap) (string, TypeDefinition, parser.SyntaxError) {

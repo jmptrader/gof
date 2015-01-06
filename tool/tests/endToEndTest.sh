@@ -21,8 +21,8 @@ if [[ $? -ne 0 ]]; then
 	fail
 fi
 
-# Generate Go from Gof
-go run $GOPATH/src/github.com/apoydence/GoF/tool/gof.go generate 
+# Generate Go from GoF
+go run $GOPATH/src/github.com/apoydence/gof/tool/gof.go generate 
 if [[ $? -ne 0 ]]; then
 	echo "Generating go from gof failed" 
 	fail

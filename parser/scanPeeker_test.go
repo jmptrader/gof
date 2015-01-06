@@ -2,7 +2,7 @@ package parser_test
 
 import (
 	"bufio"
-	. "github.com/apoydence/GoF/parser"
+	. "github.com/apoydence/gof/parser"
 	"strings"
 
 	. "github.com/onsi/ginkgo"

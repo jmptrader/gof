@@ -1,7 +1,7 @@
 package expressionParsing_test
 
 import (
-	. "github.com/apoydence/GoF/parser/expressionParsing"
+	. "github.com/apoydence/gof/parser/expressionParsing"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

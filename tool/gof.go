@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/apoydence/GoF/tool/generate"
+	"github.com/apoydence/gof/tool/generate"
 	"io/ioutil"
 	"os"
 	"path"

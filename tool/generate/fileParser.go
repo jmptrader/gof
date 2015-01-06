@@ -1,9 +1,9 @@
 package generate
 
 import (
-	"github.com/apoydence/GoF/parser"
-	"github.com/apoydence/GoF/parser/expressionParsing"
-	"github.com/apoydence/GoF/parser/statementTypes"
+	"github.com/apoydence/gof/parser"
+	"github.com/apoydence/gof/parser/expressionParsing"
+	"github.com/apoydence/gof/parser/statementTypes"
 	"io"
 )
 
