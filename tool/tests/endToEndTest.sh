@@ -22,7 +22,7 @@ if [[ $? -ne 0 ]]; then
 fi
 
 # Generate Go from Gof
-go run $GOPATH/src/github.com/apoydence/GoF/gofTool/gof.go generate 
+go run $GOPATH/src/github.com/apoydence/GoF/tool/gof.go generate 
 if [[ $? -ne 0 ]]; then
 	echo "Generating go from gof failed" 
 	fail
