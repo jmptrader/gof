@@ -82,6 +82,8 @@ Lambdas
 
 =======
 Functions have a simple syntax:
+=======
+
 ```
 func fibonacci -> n int -> int
   func subFib -> a int -> b int -> n int-> int
@@ -92,16 +94,16 @@ func fibonacci -> n int -> int
 ```
 
   This example actually demonstrates a few things:
-  + Function Currying
+  + Lambdas (`func` + `->` syntax)
   + Pattern Matching (`match` keyword)
   + Tabs over brackets
   + Lack of `return` keyword
-  + Tail Recursion (not yet implemented)
+  + Tail Recursion
 
-  Important requirements of a function:
-  + First token is the name of the function.
+  Important requirements of a Lambda:
+  + First token is the name of the lambda. (Use `_` if the name isn't used)
   + Last token is the return type. (Use `unit` if there isn't one)
-  + An argument in a function declaration has to have a name assigned to it (e.g. `n`).
+  + A type in a function declaration has to have a name assigned to it.
 
 ####Generics
 
