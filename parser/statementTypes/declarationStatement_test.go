@@ -21,28 +21,33 @@ var _ = Describe("DeclarationStatement", func() {
 
 		It("Should pick out any declaration", func() {
 			code := "a = b + 9"
-			d := statementParser.Parse(code, nil, factory).(*DeclarationStatement)
-			Expect(d).ToNot(BeNil())
-			Expect(d.VariableName()).To(Equal("a"))
-			Expect(d.CodeBlock()).To(Equal("b + 9"))
+			d, err := statementParser.Parse(code, nil, factory)
+			ds := d.(*DeclarationStatement)
+			Expect(err).To(BeNil())
+			Expect(ds).ToNot(BeNil())
+			Expect(ds.VariableName()).To(Equal("a"))
+			Expect(ds.CodeBlock()).To(Equal("b + 9"))
 		})
 		It("Should pick out a multi-lined declaration", func() {
 			code := "a = b + 9\n\t+ 6"
-			d := statementParser.Parse(code, nil, factory).(*DeclarationStatement)
-			Expect(d).ToNot(BeNil())
-			Expect(d.VariableName()).To(Equal("a"))
-			Expect(d.CodeBlock()).To(Equal("b + 9 + 6"))
+			d, err := statementParser.Parse(code, nil, factory)
+			ds := d.(*DeclarationStatement)
+			Expect(err).To(BeNil())
+			Expect(ds).ToNot(BeNil())
+			Expect(ds.VariableName()).To(Equal("a"))
+			Expect(ds.CodeBlock()).To(Equal("b + 9 + 6"))
 		})
 		It("Should return nil for a non declaration", func() {
 			code := "if true\n\t9\nelse\n\t10"
-			d := statementParser.Parse(code, nil, factory)
+			d, err := statementParser.Parse(code, nil, factory)
+			Expect(err).To(BeNil())
 			Expect(d).To(BeNil())
 		})
 	})
 	Context("GenerateGo", func() {
 		It("Should return proper go code", func() {
 			code := "a = 9 + 6"
-			d := statementParser.Parse(code, nil, factory).(*DeclarationStatement)
+			d, err := statementParser.Parse(code, nil, factory)
 			fm := expressionParsing.NewFunctionMap()
 			gocode, returnType, err := d.GenerateGo(fm)
 			Expect(err).To(BeNil())

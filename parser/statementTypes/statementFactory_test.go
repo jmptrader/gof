@@ -21,7 +21,8 @@ var _ = Describe("StatementFactory", func() {
 			bp := parser.NewScanPeeker(bs)
 			sf := NewStatementFactory(msIf, msMatch)
 
-			s := sf.Read(bp)
+			s, err := sf.Read(bp)
+			Expect(err).To(BeNil())
 			Expect(s).ToNot(BeNil())
 			Expect(s).To(Equal(msMatch))
 		})
@@ -32,7 +33,8 @@ var _ = Describe("StatementFactory", func() {
 			bp := parser.NewScanPeeker(bs)
 			sf := NewStatementFactory(msIf, msMatch)
 
-			s := sf.Read(bp)
+			s, err := sf.Read(bp)
+			Expect(err).To(BeNil())
 			Expect(s).To(BeNil())
 		})
 
@@ -42,11 +44,13 @@ var _ = Describe("StatementFactory", func() {
 			bp := parser.NewScanPeeker(bs)
 			sf := NewStatementFactory(msIf, msMatch)
 
-			s := sf.Read(bp)
+			s, err := sf.Read(bp)
+			Expect(err).To(BeNil())
 			Expect(s).ToNot(BeNil())
 			Expect(s).To(Equal(msMatch))
 
-			s = sf.Read(bp)
+			s, err = sf.Read(bp)
+			Expect(err).To(BeNil())
 			Expect(s).ToNot(BeNil())
 			Expect(s).To(Equal(msIf))
 		})
@@ -64,12 +68,12 @@ func newMockStatement(startsWith string) StatementParser {
 	}
 }
 
-func (ms mockStatement) Parse(block string, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) Statement {
+func (ms mockStatement) Parse(block string, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) (Statement, parser.SyntaxError) {
 	if strings.HasPrefix(block, ms.startsWith) {
-		return ms
+		return ms, nil
 	}
 
-	return nil
+	return nil, nil
 }
 
 func (ms mockStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, parser.SyntaxError) {
