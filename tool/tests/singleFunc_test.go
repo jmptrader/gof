@@ -1,7 +1,7 @@
 package tests_test
 
 import (
-	. "github.com/apoydence/GoF/gofTool/tests"
+	. "github.com/apoydence/GoF/tool/tests"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
