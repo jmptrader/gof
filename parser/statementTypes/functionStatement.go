@@ -81,7 +81,7 @@ func fetchParts(code string) (string, string, bool) {
 	return match[groupIndex["name"]], match[groupIndex["typeDef"]], true
 }
 
-func (fs *FunctionStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, error) {
+func (fs *FunctionStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, parser.SyntaxError) {
 	fm.AddFunction(fs.FuncName, fs.TypeDef)
 	innerScope := fm.NextScopeLayer()
 	setupFuncMap(innerScope, fs.TypeDef.(expressionParsing.FuncTypeDefinition))
@@ -92,7 +92,7 @@ func (fs *FunctionStatement) GenerateGo(fm expressionParsing.FunctionMap) (strin
 	return fmt.Sprintf("func %s %s{\n\t%s\n}", fs.FuncName, generateTypeDef(true, fs.TypeDef), generateInnerFunc(fs.TypeDef, 1, inner)), fs.TypeDef, nil
 }
 
-func generateInnerGo(fm expressionParsing.FunctionMap, statements []Statement) ([]string, error) {
+func generateInnerGo(fm expressionParsing.FunctionMap, statements []Statement) ([]string, parser.SyntaxError) {
 	code := make([]string, 0)
 	for _, s := range statements {
 		c, _, err := s.GenerateGo(fm)

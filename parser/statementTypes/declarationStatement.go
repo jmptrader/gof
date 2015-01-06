@@ -66,15 +66,19 @@ func combineBlock(firstLine string, lines []string) string {
 	return result
 }
 
-func (ds *DeclarationStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, error) {
-	innerCode, returnType, err := ds.innerStatement.GenerateGo(fm.NextScopeLayer())
+func (ds *DeclarationStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, parser.SyntaxError) {
+	innerCode, returnType, synErr := ds.innerStatement.GenerateGo(fm.NextScopeLayer())
 
-	if err != nil {
-		return "", nil, err
+	if synErr != nil {
+		return "", nil, synErr
 	}
 
 	fd := expressionParsing.NewFuncTypeDefinition("", nil, returnType)
 	name, err := fm.AddFunction(ds.varName, fd)
+
+	if err != nil {
+		return "", nil, parser.NewSyntaxError(err.Error(), 0, 0)
+	}
 
 	genCode := fmt.Sprintf("var %s func() %s\n%s = func(){\n\treturn %s\n}", name, returnType.Name(), name, innerCode)
 	return genCode, returnType, nil
