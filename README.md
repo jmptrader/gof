@@ -1,7 +1,7 @@
 GoF
 ===
 
-A Functional programming language that compiles down to Go.  Currently GoF is nothing more than a set of ideas.
+A Functional programming language that compiles down to Go.  Currently GoF is nothing more than a set of ideas.  
 
 If you have some that you would like to share, please feel free!  GoF is intended to be what Go hasn't for coders, so if you seem a feature that would fit, speak up!
 
@@ -19,8 +19,6 @@ The intention of the language is to allow you to write strongly typed functional
 
 ===
 
-Functions
-=======
 Language Details
 ================
 
@@ -50,7 +48,7 @@ NOTE: The suffix IS case sensitive. Meaning a `3UI` is invalid.
 To denote a hex value, prefix the number with a `0x`. For octal, prefix the value with a `0`.  This is the same as Go.
 
 ####Functions
-Functions have a simple syntax:
+
 ```
 func fibonacci -> n int -> int
   func subFib -> a int -> b int -> n int-> int
@@ -58,19 +56,19 @@ func fibonacci -> n int -> int
       0,1,2 -> a
       n     -> subFib a+b a n-1
   subFib n
-```
+```  
 
   This example actually demonstrates a few things:
-  + Function Currying
+  + Lambdas (`func` + `->` syntax)
   + Pattern Matching (`match` keyword)
   + Tabs over brackets
   + Lack of `return` keyword
-  + Tail Recursion (not yet implemented)
-
-  Important requirements of a function:
-  + First token is the name of the function.
+  + Tail Recursion
+  
+  Important requirements of a Lambda:
+  + First token is the name of the lambda. (Use `_` if the name isn't used)
   + Last token is the return type. (Use `unit` if there isn't one)
-  + An argument in a function declaration has to have a name assigned to it (e.g. `n`).
+  + A type in a function declaration has to have a name assigned to it.
 
 ####Generics
 
@@ -79,7 +77,7 @@ Generics are not defined explicitly, but by leaving type information out for the
 ```
 func double -> a' -> a'
   a + a
-
+  
 double 2 // Results in 4
 ```
 
@@ -88,7 +86,7 @@ The only requirement is that whatever type `a` turns out to be, has the `+` oper
 ```
 func encode -> a' -> b' -> b`
   a.encode b
-```
+```  
 
 This function will take two parameters (`a` and `b`) where the type `a` has a method `encode` that takes type `b`.  The method `encode` will have to return the type `b`
 
@@ -137,7 +135,7 @@ Functions can be partially called:
 ```
 func add -> a int -> b int-> int
   a + b
-
+  
 x = add 1 // x is now a func -> a int -> int
 y = x 2 // y is now 3
 ```
