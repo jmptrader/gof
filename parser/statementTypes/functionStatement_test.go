@@ -36,7 +36,8 @@ var _ = Describe("FunctionStatement", func() {
 			f := statementParser.Parse(code, nil, factory)
 			code, _, err := f.GenerateGo(fm)
 			Expect(err).To(BeNil())
-			Expect(matchCode(code, "func addTogether (a int32) func (b int32) func (c int32) int32{\n\treturn func (b int32) func (c int32) int32 {\n\t\treturn func (c int32) int32 {\n\t\t\t\n\t\t\treturn ((_2()+_1())+_0())\n\t\t}\n\t}\n}")).To(BeTrue())
+			Expect(fm.GetFunction("addTogether")).ToNot(BeNil())
+			Expect(matchCode(code, "func addTogether (a int32) func (b int32) func (c int32) int32{\n\treturn func (b int32) func (c int32) int32 {\n\t\treturn func (c int32) int32 {\n\t\t\t\n\t\t\treturn ((a+b)+c)\n\t\t}\n\t}\n}")).To(BeTrue())
 		})
 		It("Should generate a proper Go function with multiple inner statements", func() {
 			fm := expressionParsing.NewFunctionMap()
@@ -44,7 +45,7 @@ var _ = Describe("FunctionStatement", func() {
 			f := statementParser.Parse(code, nil, factory)
 			code, _, err := f.GenerateGo(fm)
 			Expect(err).To(BeNil())
-			Expect(matchCode(code, "func addTogether (a int32) func (b int32) func (c int32) int32{\n\treturn func (b int32) func (c int32) int32 {\n\t\treturn func (c int32) int32 {\n\t\t\t\n\t\t\tvar _3 func() int32\n_3 = func(){return 6}return (((_2()+_1())+_0())+_3())\n\t\t}\n\t}\n}")).To(BeTrue())
+			Expect(matchCode(code, "func addTogether (a int32) func (b int32) func (c int32) int32{\n\treturn func (b int32) func (c int32) int32 {\n\t\treturn func (c int32) int32 {\n\t\t\t\n\t\t\tvar d func() int32\nd = func(){return 6}return (((a+b)+c)+d())\n\t\t}\n\t}\n}")).To(BeTrue())
 		})
 	})
 })

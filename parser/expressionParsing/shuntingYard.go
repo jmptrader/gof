@@ -7,20 +7,21 @@ import (
 
 func toRpn(line string, outputQueue []rpnValue, opStack []rpnValue, fm FunctionMap) ([]string, error) {
 	token, rest := parser.Tokenize(line)
-	if parser.IsPrimitive(token) {
-		return toRpn(rest, append(outputQueue, newPrimRpnValue(token)), opStack, fm)
-	} else if parser.IsOperator(token) {
+	if parser.IsOperator(token) {
 		return toRpnOperator(token, rest, outputQueue, opStack, fm)
 	} else if token == "(" {
 		return toRpn(rest, outputQueue, append(opStack, newParenRpnValue()), fm)
 	} else if token == ")" {
 		return toRpnRightParen(token, rest, outputQueue, opStack, fm)
-	} else if fd := fm.GetFunction(token); fd != nil {
-		if fd.IsDefinition() {
+	} else if fd := fm.GetFunction(token); fd != nil && fd.IsFunc() {
+		ftd := fd.(FuncTypeDefinition)
+		if ftd.IsDefinition() {
 			return toRpn(rest, append(outputQueue, newPrimRpnValue(token)), opStack, fm)
 		} else {
 			return toRpn(rest, outputQueue, append(opStack, newOpRpnValue(token, FuncCall)), fm)
 		}
+	} else if parser.IsPrimitive(token) || parser.ValidFunctionName(token) {
+		return toRpn(rest, append(outputQueue, newPrimRpnValue(token)), opStack, fm)
 	} else if token == "" {
 		for i := len(opStack) - 1; i > -1; i-- {
 			outputQueue = append(outputQueue, opStack[i])

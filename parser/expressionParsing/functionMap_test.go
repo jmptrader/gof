@@ -20,13 +20,13 @@ var _ = Describe("FunctionMap", func() {
 			c, err := fm.AddFunction("c", fi)
 			Expect(err).To(BeNil())
 
-			Expect(a).To(Equal("_0"))
-			Expect(b).To(Equal("_1"))
-			Expect(c).To(Equal("_2"))
+			Expect(a).To(Equal("a"))
+			Expect(b).To(Equal("b"))
+			Expect(c).To(Equal("c"))
 
-			Expect(fm.GetFunction("a").FuncName()).To(Equal(a))
-			Expect(fm.GetFunction("b").FuncName()).To(Equal(b))
-			Expect(fm.GetFunction("c").FuncName()).To(Equal(c))
+			Expect(fm.GetFunction("a").(FuncTypeDefinition).FuncName()).To(Equal(a))
+			Expect(fm.GetFunction("b").(FuncTypeDefinition).FuncName()).To(Equal(b))
+			Expect(fm.GetFunction("c").(FuncTypeDefinition).FuncName()).To(Equal(c))
 		})
 		It("Should return null for an unknown function", func() {
 			fm := NewFunctionMap()

@@ -7,43 +7,46 @@ import (
 
 type funcMap struct {
 	prevScope FunctionMap
-	fm        map[string]FuncTypeDefinition
+	fm        map[string]TypeDefinition
 	count     int
 }
 
 func NewFunctionMap() FunctionMap {
 	return &funcMap{
-		fm: make(map[string]FuncTypeDefinition),
+		fm: make(map[string]TypeDefinition),
 	}
 }
 
 func newFunctionMap(prevScope FunctionMap) FunctionMap {
 	return &funcMap{
-		fm:        make(map[string]FuncTypeDefinition),
+		fm:        make(map[string]TypeDefinition),
 		prevScope: prevScope,
 	}
 }
 
-func (fm *funcMap) GetFunction(name string) *FuncTypeDefinition {
+func (fm *funcMap) GetFunction(name string) TypeDefinition {
 	if d, ok := fm.fm[name]; ok {
-		return &d
+		return d
 	} else if fm.prevScope != nil {
 		return fm.prevScope.GetFunction(name)
 	}
 	return nil
 }
 
-func (fm *funcMap) AddFunction(name string, f *FuncTypeDefinition) (string, error) {
+func (fm *funcMap) AddFunction(name string, f TypeDefinition) (string, error) {
 	if fm.GetFunction(name) != nil {
 		return "", errors.New("The function name'" + name + "' is already allocated.")
 	}
 
-	cloned := *f
-	genName := fm.getNextFunctionName()
-	cloned.name = genName
-	fm.fm[name] = cloned
+	if fd, ok := f.(*funcTypeDefinition); ok {
+		clone := *fd
+		clone.name = name
+		f = &clone
+	}
 
-	return genName, nil
+	fm.fm[name] = f
+
+	return name, nil
 }
 
 func (fm *funcMap) NextScopeLayer() FunctionMap {

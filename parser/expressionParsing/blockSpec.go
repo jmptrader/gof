@@ -22,10 +22,14 @@ func newBlockSpec(op string, valueType TypeDefinition) *blockSpec {
 
 func findType(token string, fm FunctionMap) (string, TypeDefinition) {
 	if fd := fm.GetFunction(token); fd != nil {
-		if fd.IsDefinition() {
-			return fd.FuncName() + "()", fd.ReturnType()
+		if tfd, ok := fd.(FuncTypeDefinition); ok && tfd.IsFunc() {
+			if tfd.IsDefinition() {
+				return tfd.FuncName() + "()", tfd.ReturnType()
+			}
+			return token, tfd.ReturnType()
+		} else {
+			return token, fd.ReturnType()
 		}
-		return token, fd.ReturnType()
 	} else {
 		return findPrimType(token)
 	}
