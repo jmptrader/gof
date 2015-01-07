@@ -14,6 +14,7 @@ type syntaxError struct {
 
 func NewSyntaxError(message string, line, column int) SyntaxError {
 	return syntaxError{
+		msg:  message,
 		line: line,
 		col:  column,
 	}
