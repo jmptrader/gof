@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"bufio"
 	"strings"
 )
 
@@ -9,6 +8,7 @@ type Scanner interface {
 	Scan() bool
 	Text() string
 	Err() error
+	LineNumber() int
 }
 
 type ScanPeeker struct {
@@ -16,6 +16,7 @@ type ScanPeeker struct {
 	peeked     string
 	readPeeked bool
 	scanCheck  bool
+	line       int
 }
 
 func NewScanPeeker(scanner Scanner) *ScanPeeker {
@@ -26,30 +27,31 @@ func NewScanPeeker(scanner Scanner) *ScanPeeker {
 }
 
 func NewScanPeekerStr(block string) *ScanPeeker {
-	return NewScanPeeker(bufio.NewScanner(strings.NewReader(block)))
+	return NewScanPeeker(NewBlockScanner(strings.NewReader(block), nil))
 }
 
-func (sp *ScanPeeker) Peek() (bool, string) {
-	ok, value := sp.Read()
+func (sp *ScanPeeker) Peek() (bool, string, int) {
+	ok, value, line := sp.Read()
 	sp.peeked = value
 	sp.readPeeked = true
-	return ok, sp.peeked
+	sp.line = line
+	return ok, sp.peeked, sp.line
 }
 
-func (sp *ScanPeeker) Read() (bool, string) {
+func (sp *ScanPeeker) Read() (bool, string, int) {
 	defer func() {
 		sp.readPeeked = false
 	}()
 
 	if sp.readPeeked {
 		sp.readPeeked = false
-		return true, sp.peeked
+		return true, sp.peeked, sp.line
 	}
 
 	if !sp.scanCheck {
-		return false, ""
+		return false, "", -1
 	}
 
 	sp.scanCheck = sp.scanner.Scan()
-	return sp.scanCheck && sp.scanner.Err() == nil, sp.scanner.Text()
+	return sp.scanCheck && sp.scanner.Err() == nil, sp.scanner.Text(), sp.scanner.LineNumber()
 }

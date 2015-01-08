@@ -7,11 +7,13 @@ import (
 )
 
 type BlockScanner struct {
-	err      error
-	block    string
-	prevLine string
-	scanner  *bufio.Scanner
-	pre      func(string) string
+	err       error
+	block     string
+	prevLine  string
+	scanner   *bufio.Scanner
+	pre       func(string) string
+	line      int
+	blockLine int
 }
 
 func NewBlockScanner(code io.Reader, preRead func(string) string) *BlockScanner {
@@ -28,14 +30,17 @@ func NewBlockScanner(code io.Reader, preRead func(string) string) *BlockScanner 
 }
 
 func (bs *BlockScanner) Scan() bool {
+	bs.blockLine = bs.line
 	bs.block = ""
 	enteredBlock := false
 	for len(bs.prevLine) > 0 || bs.scanner.Scan() {
 		var text string
 		if len(bs.prevLine) > 0 {
 			text = bs.prevLine
+			bs.blockLine--
 		} else {
 			text = bs.getLineFromScanner()
+			bs.line++
 		}
 		tabs := startsWithTab(text)
 		tabbed := tabs > 0
@@ -80,4 +85,8 @@ func (bs *BlockScanner) Err() error {
 
 func (bs *BlockScanner) Text() string {
 	return strings.TrimSpace(bs.block)
+}
+
+func (bs *BlockScanner) LineNumber() int {
+	return bs.blockLine
 }

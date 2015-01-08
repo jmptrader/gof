@@ -56,10 +56,12 @@ var _ = Describe("BlockScanner", func() {
 			Expect(scanner.Scan()).To(BeTrue())
 			Expect(scanner.Err()).To(BeNil())
 			Expect(scanner.Text()).To(Equal("func a -> b int -> int\n\tb + 9"))
+			Expect(scanner.LineNumber()).To(Equal(0))
 
 			Expect(scanner.Scan()).To(BeTrue())
 			Expect(scanner.Err()).To(BeNil())
 			Expect(scanner.Text()).To(Equal("func b -> c int -> int\n\tc - 4"))
+			Expect(scanner.LineNumber()).To(Equal(3))
 
 			Expect(scanner.Scan()).To(BeFalse())
 			Expect(scanner.Err()).To(BeNil())
