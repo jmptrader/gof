@@ -49,6 +49,18 @@ func FromLines(lines []string) string {
 	return ret
 }
 
+func RemoveTabs(lines []string) []string {
+	newLines := make([]string, 0)
+	for _, line := range lines {
+		if len(line) > 0 && line[0] == '\t' {
+			newLines = append(newLines, line[1:])
+		} else {
+			panic("Line didn't start with a tab")
+		}
+	}
+	return newLines
+}
+
 func IsNumber(value string) bool {
 	return regNum.MatchString(value)
 }

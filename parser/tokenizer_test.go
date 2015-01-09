@@ -36,6 +36,12 @@ var _ = Describe("Parser", func() {
 			Expect(block).To(Equal("a\nb\nc\n"))
 		})
 	})
+	Context("RemoveTabs", func() {
+		It("Should remove the first tab from a series of lines", func() {
+			lines := []string{"\ta", "\tb", "\tc"}
+			Expect(RemoveTabs(lines)).To(Equal([]string{"a", "b", "c"}))
+		})
+	})
 	Context("IsNumber", func() {
 		It("Should be distinguish a float or int", func() {
 			i := "324"
