@@ -17,21 +17,23 @@ type FunctionStatement struct {
 	FuncName        string
 	TypeDef         expressionParsing.TypeDefinition
 	InnerStatements []Statement
+	lineNum         int
 }
 
 func NewFunctionStatementParser() StatementParser {
 	return FunctionStatement{}
 }
 
-func newFunctionStatement(name string, typeDef expressionParsing.FuncTypeDefinition, inner []Statement) Statement {
+func newFunctionStatement(name string, lineNum int, typeDef expressionParsing.FuncTypeDefinition, inner []Statement) Statement {
 	return &FunctionStatement{
 		FuncName:        name,
 		TypeDef:         typeDef,
 		InnerStatements: inner,
+		lineNum:         lineNum,
 	}
 }
 
-func (fs FunctionStatement) Parse(block string, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) (Statement, parser.SyntaxError) {
+func (fs FunctionStatement) Parse(block string, lineNum int, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) (Statement, parser.SyntaxError) {
 	lines := parser.Lines(block)
 	name, typeDefStr, ok := fetchParts(lines[0])
 	if !ok {
@@ -43,14 +45,14 @@ func (fs FunctionStatement) Parse(block string, nextBlockScanner *parser.ScanPee
 		return nil, err
 	}
 
-	innerStatements, err := fetchInnerStatements(lines[1:], factory)
+	innerStatements, err := fetchInnerStatements(parser.RemoveTabs(lines[1:]), factory)
 	if err != nil {
 		return nil, err
 	}
 
 	// CHECK TO SEE IF THE LAST STATEMENT IS A DECLARATION
 
-	return newFunctionStatement(name, typeDef, innerStatements), nil
+	return newFunctionStatement(name, lineNum, typeDef, innerStatements), nil
 }
 
 func fetchInnerStatements(lines []string, factory *StatementFactory) ([]Statement, parser.SyntaxError) {
@@ -98,6 +100,10 @@ func (fs *FunctionStatement) GenerateGo(fm expressionParsing.FunctionMap) (strin
 		return "", nil, err
 	}
 	return fmt.Sprintf("func %s %s{\n\t%s\n}", fs.FuncName, generateTypeDef(true, fs.TypeDef), generateInnerFunc(fs.TypeDef, 1, inner)), fs.TypeDef, nil
+}
+
+func (fs *FunctionStatement) LineNumber() int {
+	return fs.lineNum
 }
 
 func generateInnerGo(fm expressionParsing.FunctionMap, statements []Statement) ([]string, parser.SyntaxError) {

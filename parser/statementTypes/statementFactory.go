@@ -7,10 +7,11 @@ import (
 
 type Statement interface {
 	GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, parser.SyntaxError)
+	LineNumber() int
 }
 
 type StatementParser interface {
-	Parse(block string, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) (Statement, parser.SyntaxError)
+	Parse(block string, lineNumber int, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) (Statement, parser.SyntaxError)
 }
 
 type StatementFactory struct {
@@ -24,14 +25,14 @@ func NewStatementFactory(statements ...StatementParser) *StatementFactory {
 }
 
 func (sf *StatementFactory) Read(blockPeeker *parser.ScanPeeker) (Statement, parser.SyntaxError) {
-	ok, value := blockPeeker.Read()
+	ok, value, lineNum := blockPeeker.Read()
 
 	if !ok {
 		return nil, nil
 	}
 
 	for _, s := range sf.statements {
-		statement, err := s.Parse(value, blockPeeker, sf)
+		statement, err := s.Parse(value, lineNum, blockPeeker, sf)
 		if err != nil {
 			return nil, err
 		} else if statement != nil {

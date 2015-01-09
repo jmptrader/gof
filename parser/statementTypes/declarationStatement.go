@@ -10,21 +10,23 @@ type DeclarationStatement struct {
 	varName        string
 	code           string
 	innerStatement Statement
+	lineNum        int
 }
 
 func NewDeclarationParser() StatementParser {
 	return DeclarationStatement{}
 }
 
-func newDeclarationStatement(varName, code string, innerStatement Statement) Statement {
+func newDeclarationStatement(varName, code string, lineNum int, innerStatement Statement) Statement {
 	return &DeclarationStatement{
 		varName:        varName,
 		code:           code,
 		innerStatement: innerStatement,
+		lineNum:        lineNum,
 	}
 }
 
-func (ds DeclarationStatement) Parse(block string, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) (Statement, parser.SyntaxError) {
+func (ds DeclarationStatement) Parse(block string, lineNum int, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) (Statement, parser.SyntaxError) {
 	lines := parser.Lines(block)
 
 	ok, varName, restOfLine := splitEquals(lines[0])
@@ -36,7 +38,7 @@ func (ds DeclarationStatement) Parse(block string, nextBlockScanner *parser.Scan
 		if err != nil {
 			return nil, err
 		}
-		return newDeclarationStatement(varName, combinedLine, st), nil
+		return newDeclarationStatement(varName, combinedLine, lineNum, st), nil
 	}
 
 	return nil, nil
@@ -94,4 +96,8 @@ func (ds *DeclarationStatement) VariableName() string {
 
 func (ds *DeclarationStatement) CodeBlock() string {
 	return ds.code
+}
+
+func (ds *DeclarationStatement) LineNumber() int {
+	return ds.lineNum
 }

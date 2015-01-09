@@ -68,7 +68,7 @@ func newMockStatement(startsWith string) StatementParser {
 	}
 }
 
-func (ms mockStatement) Parse(block string, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) (Statement, parser.SyntaxError) {
+func (ms mockStatement) Parse(block string, lineNum int, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) (Statement, parser.SyntaxError) {
 	if strings.HasPrefix(block, ms.startsWith) {
 		return ms, nil
 	}
@@ -78,4 +78,8 @@ func (ms mockStatement) Parse(block string, nextBlockScanner *parser.ScanPeeker,
 
 func (ms mockStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, parser.SyntaxError) {
 	return "", nil, nil
+}
+
+func (ms mockStatement) LineNumber() int {
+	return -1
 }

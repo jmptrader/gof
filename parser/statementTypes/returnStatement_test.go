@@ -21,7 +21,7 @@ var _ = Describe("ReturnStatement", func() {
 
 		It("Should pick out the statement", func() {
 			code := "a + 9"
-			r, err := statementParser.Parse(code, nil, factory)
+			r, err := statementParser.Parse(code, 0, nil, factory)
 			Expect(err).To(BeNil())
 			Expect(r).ToNot(BeNil())
 		})
@@ -34,7 +34,7 @@ var _ = Describe("ReturnStatement", func() {
 		Context("No functions", func() {
 			It("Should generate the proper Go code", func() {
 				code := "( 1 + 11 ) - 10 / 2"
-				r, err := statementParser.Parse(code, nil, factory)
+				r, err := statementParser.Parse(code, 0, nil, factory)
 				Expect(err).To(BeNil())
 				genGo, returnType, err := r.GenerateGo(funcMap)
 				Expect(err).To(BeNil())
@@ -43,7 +43,7 @@ var _ = Describe("ReturnStatement", func() {
 			})
 			It("Should generate the proper Go code with proper numeric types", func() {
 				code := "( 1b + 11b ) - 10b / 2b"
-				r, err := statementParser.Parse(code, nil, factory)
+				r, err := statementParser.Parse(code, 0, nil, factory)
 				Expect(err).To(BeNil())
 				genGo, returnType, err := r.GenerateGo(funcMap)
 				Expect(err).To(BeNil())
@@ -55,7 +55,7 @@ var _ = Describe("ReturnStatement", func() {
 			var intType expressionParsing.TypeDefinition = expressionParsing.NewPrimTypeDefinition("int32")
 			It("Should generate the proper Go code with a definition", func() {
 				code := "( 1 + 11 ) - a / 2"
-				r, err := statementParser.Parse(code, nil, factory)
+				r, err := statementParser.Parse(code, 0, nil, factory)
 				Expect(err).To(BeNil())
 				fm := expressionParsing.NewFunctionMap()
 				name, _ := fm.AddFunction("a", expressionParsing.NewFuncTypeDefinition("", nil, intType))
@@ -66,7 +66,7 @@ var _ = Describe("ReturnStatement", func() {
 			})
 			It("Should generate the proper Go code with definitions", func() {
 				code := "a + b + c"
-				r, err := statementParser.Parse(code, nil, factory)
+				r, err := statementParser.Parse(code, 0, nil, factory)
 				Expect(err).To(BeNil())
 				fm := expressionParsing.NewFunctionMap()
 				nameA, _ := fm.AddFunction("a", expressionParsing.NewFuncTypeDefinition("", nil, intType))
@@ -79,7 +79,7 @@ var _ = Describe("ReturnStatement", func() {
 			})
 			It("Should generate the proper Go code with a function", func() {
 				code := "( 7 + 13 ) - a 5 / 8"
-				r, err := statementParser.Parse(code, nil, factory)
+				r, err := statementParser.Parse(code, 0, nil, factory)
 				Expect(err).To(BeNil())
 				fm := expressionParsing.NewFunctionMap()
 				name, _ := fm.AddFunction("a", expressionParsing.NewFuncTypeDefinition("", intType, intType))
@@ -90,7 +90,7 @@ var _ = Describe("ReturnStatement", func() {
 			})
 			It("Should generate the proper Go code with a curried function", func() {
 				code := "( 7 + 13 ) - a 5 9 / 8"
-				r, err := statementParser.Parse(code, nil, factory)
+				r, err := statementParser.Parse(code, 0, nil, factory)
 				Expect(err).To(BeNil())
 				fm := expressionParsing.NewFunctionMap()
 				f1 := expressionParsing.NewFuncTypeDefinition("", intType, intType)
@@ -103,7 +103,7 @@ var _ = Describe("ReturnStatement", func() {
 			})
 			It("Should generate the proper Go code with multiple functions", func() {
 				code := "( 7 + 13 ) - a 5 b 9 / 8"
-				r, err := statementParser.Parse(code, nil, factory)
+				r, err := statementParser.Parse(code, 0, nil, factory)
 				Expect(err).To(BeNil())
 				fm := expressionParsing.NewFunctionMap()
 				f1 := expressionParsing.NewFuncTypeDefinition("", intType, intType)
@@ -117,7 +117,7 @@ var _ = Describe("ReturnStatement", func() {
 			})
 			It("Should generate the proper Go code with layered functions", func() {
 				code := "( 7 + 13 ) - c ( a 5 b 9 / 8 ) 10"
-				r, err := statementParser.Parse(code, nil, factory)
+				r, err := statementParser.Parse(code, 0, nil, factory)
 				Expect(err).To(BeNil())
 				fm := expressionParsing.NewFunctionMap()
 				f1 := expressionParsing.NewFuncTypeDefinition("", intType, intType)
