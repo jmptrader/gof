@@ -48,10 +48,10 @@ var _ = Describe("BlockScanner", func() {
 			Expect(scanner.Text()).To(Equal("else\n\t9"))
 		})
 	})
-	Context("Pre-Reader removes tabs", func() {
+	Context("Removes tabs", func() {
 		It("Should break up the blocks", func() {
-			code := "\tfunc a -> b int -> int\n\t\tb + 9\n\nfunc b -> c int -> int\n\t\t c - 4\n\n"
-			scanner := NewBlockScanner(strings.NewReader(code), removeTabPre)
+			code := "func a -> b int -> int\n\tb + 9\n\nfunc b -> c int -> int\n\tc - 4\n\n"
+			scanner := NewBlockScanner(strings.NewReader(code), nil)
 
 			Expect(scanner.Scan()).To(BeTrue())
 			Expect(scanner.Err()).To(BeNil())
@@ -66,6 +66,24 @@ var _ = Describe("BlockScanner", func() {
 			Expect(scanner.Scan()).To(BeFalse())
 			Expect(scanner.Err()).To(BeNil())
 			Expect(scanner.Text()).To(Equal(""))
+		})
+	})
+	Context("Unhappy", func() {
+		It("Should error with a leading tab", func() {
+			code := "\n\tfunc a -> b int -> int\n\t\tb + 9"
+			scanner := NewBlockScanner(strings.NewReader(code), nil)
+
+			Expect(scanner.Scan()).To(BeFalse())
+			Expect(scanner.Err()).ToNot(BeNil())
+			Expect(scanner.LineNumber()).To(Equal(1))
+		})
+		It("Should error with an inner extra tab", func() {
+			code := "\nfunc a -> b int -> int\n\t\tb + 9"
+			scanner := NewBlockScanner(strings.NewReader(code), nil)
+
+			Expect(scanner.Scan()).To(BeFalse())
+			Expect(scanner.Err()).ToNot(BeNil())
+			Expect(scanner.LineNumber()).To(Equal(1))
 		})
 	})
 })

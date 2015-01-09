@@ -2,6 +2,7 @@ package parser
 
 import (
 	"bufio"
+	"errors"
 	"io"
 	"strings"
 )
@@ -30,9 +31,11 @@ func NewBlockScanner(code io.Reader, preRead func(string) string) *BlockScanner 
 }
 
 func (bs *BlockScanner) Scan() bool {
-	bs.blockLine = bs.line
 	bs.block = ""
 	enteredBlock := false
+	removeTabs := 0
+	firstLine := true
+	prevTab := 0
 	for len(bs.prevLine) > 0 || bs.scanner.Scan() {
 		var text string
 		if len(bs.prevLine) > 0 {
@@ -42,21 +45,50 @@ func (bs *BlockScanner) Scan() bool {
 			text = bs.getLineFromScanner()
 			bs.line++
 		}
+
 		tabs := startsWithTab(text)
+
+		if tabs > prevTab+1 {
+			bs.err = errors.New("Incorrect number of tabs")
+			break
+		}
+
+		prevTab = tabs
+
+		if firstLine && len(strings.TrimSpace(text)) > 0 {
+			bs.blockLine = bs.line - 1
+			firstLine = false
+			if tabs != 0 {
+				bs.err = errors.New("Incorrect number of tabs")
+				break
+			}
+		}
+
+		if !enteredBlock && tabs > 0 || removeTabs > 0 && len(text) > 0 && text[0] == '\t' {
+			removeTabs = tabs
+			text = text[1:]
+			tabs--
+		}
+
 		tabbed := tabs > 0
+
 		if (!enteredBlock && !tabbed) || (enteredBlock && tabbed) {
-			enteredBlock = true
-			bs.block = bs.block + "\n" + trim(text, tabs)
-			bs.prevLine = ""
+			if len(strings.TrimSpace(text)) > 0 {
+				enteredBlock = true
+				bs.block = bs.block + "\n" + trim(text, tabs)
+				bs.prevLine = ""
+			}
 		} else {
-			bs.prevLine = bs.getLineFromScanner()
+			bs.prevLine = text
 			enteredBlock = false
 			return true
 		}
 	}
 
-	bs.err = bs.scanner.Err()
-	return enteredBlock
+	if bs.err == nil {
+		bs.err = bs.scanner.Err()
+	}
+	return bs.err == nil && enteredBlock
 }
 
 func (bs *BlockScanner) getLineFromScanner() string {
