@@ -130,6 +130,15 @@ var _ = Describe("ReturnStatement", func() {
 				Expect(returnType.Name()).To(BeEquivalentTo("int32"))
 				Expect(genGo).To(Equal(fmt.Sprintf("((7+13)-%s((%s(5)(%s(9))/8))(10))", nameC, nameA, nameB)))
 			})
+			It("Should return an error when adding a double to an int", func() {
+				code := " 7 + 13.0"
+				r, err := statementParser.Parse(code, 9, nil, factory)
+				Expect(err).To(BeNil())
+				fm := expressionParsing.NewFunctionMap()
+				_, _, err = r.GenerateGo(fm)
+				Expect(err).ToNot(BeNil())
+				Expect(err.Line()).To(Equal(9))
+			})
 		})
 	})
 })

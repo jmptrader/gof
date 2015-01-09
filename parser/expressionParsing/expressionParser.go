@@ -8,15 +8,25 @@ type FunctionMap interface {
 	NextScopeLayer() FunctionMap
 }
 
-func ToRpn(line string, fm FunctionMap) ([]string, parser.SyntaxError) {
-	return toRpn(line, []rpnValue{}, []rpnValue{}, fm)
-}
-
-func ToGoExpression(line string, fm FunctionMap) (string, TypeDefinition, parser.SyntaxError) {
-	rpn, err := ToRpn(line, fm)
+func ToRpn(line string, lineNum int, fm FunctionMap) ([]string, parser.SyntaxError) {
+	rpn, err := toRpn(line, []rpnValue{}, []rpnValue{}, fm)
 	if err != nil {
-		return "", nil, err
+		return nil, parser.NewSyntaxError(err.Error(), lineNum, 0)
 	}
 
-	return ToInfix(rpn, fm)
+	return rpn, nil
+}
+
+func ToGoExpression(line string, lineNum int, fm FunctionMap) (string, TypeDefinition, parser.SyntaxError) {
+	rpn, synErr := ToRpn(line, lineNum, fm)
+	if synErr != nil {
+		return "", nil, synErr
+	}
+
+	result, td, err := ToInfix(rpn, fm)
+	if err != nil {
+		return "", nil, parser.NewSyntaxError(err.Error(), lineNum, 0)
+	}
+
+	return result, td, nil
 }

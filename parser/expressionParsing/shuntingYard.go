@@ -1,10 +1,11 @@
 package expressionParsing
 
 import (
+	"errors"
 	"github.com/apoydence/gof/parser"
 )
 
-func toRpn(line string, outputQueue []rpnValue, opStack []rpnValue, fm FunctionMap) ([]string, parser.SyntaxError) {
+func toRpn(line string, outputQueue []rpnValue, opStack []rpnValue, fm FunctionMap) ([]string, error) {
 	token, rest := parser.Tokenize(line)
 	if parser.IsOperator(token) {
 		return toRpnOperator(token, rest, outputQueue, opStack, fm)
@@ -28,10 +29,10 @@ func toRpn(line string, outputQueue []rpnValue, opStack []rpnValue, fm FunctionM
 		return rpnToString(outputQueue), nil
 	}
 
-	return nil, parser.NewSyntaxError("Unknown token: "+token, 0, 0)
+	return nil, errors.New("Unknown token: " + token)
 }
 
-func toRpnOperator(token, rest string, outputQueue []rpnValue, opStack []rpnValue, fm FunctionMap) ([]string, parser.SyntaxError) {
+func toRpnOperator(token, rest string, outputQueue []rpnValue, opStack []rpnValue, fm FunctionMap) ([]string, error) {
 	prec := opPrec(token)
 	op := newOpRpnValue(token, prec)
 	if len(opStack) > 0 {
@@ -47,7 +48,7 @@ func toRpnOperator(token, rest string, outputQueue []rpnValue, opStack []rpnValu
 	}
 }
 
-func toRpnRightParen(token, rest string, outputQueue []rpnValue, opStack []rpnValue, fm FunctionMap) ([]string, parser.SyntaxError) {
+func toRpnRightParen(token, rest string, outputQueue []rpnValue, opStack []rpnValue, fm FunctionMap) ([]string, error) {
 	var i int
 	for i = len(opStack) - 1; !opStack[i].leftPar; i-- {
 		outputQueue = append(outputQueue, opStack[i])

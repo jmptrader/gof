@@ -33,7 +33,7 @@ func (rs ReturnStatement) Parse(block string, lineNum int, nextBlockScanner *par
 }
 
 func (ds *ReturnStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, parser.SyntaxError) {
-	return expressionParsing.ToGoExpression(ds.block, fm)
+	return expressionParsing.ToGoExpression(ds.block, ds.lineNum, fm)
 }
 
 func (ds *ReturnStatement) LineNumber() int {
