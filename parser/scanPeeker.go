@@ -17,6 +17,7 @@ type ScanPeeker struct {
 	readPeeked bool
 	scanCheck  bool
 	line       int
+	err        error
 }
 
 func NewScanPeeker(scanner Scanner) *ScanPeeker {
@@ -54,4 +55,8 @@ func (sp *ScanPeeker) Read() (bool, string, int) {
 
 	sp.scanCheck = sp.scanner.Scan()
 	return sp.scanCheck && sp.scanner.Err() == nil, sp.scanner.Text(), sp.scanner.LineNumber()
+}
+
+func (sp *ScanPeeker) Err() error {
+	return sp.scanner.Err()
 }

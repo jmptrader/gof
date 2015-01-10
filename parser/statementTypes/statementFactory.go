@@ -28,6 +28,9 @@ func (sf *StatementFactory) Read(blockPeeker *parser.ScanPeeker) (Statement, par
 	ok, value, lineNum := blockPeeker.Read()
 
 	if !ok {
+		if blockPeeker.Err() != nil {
+			return nil, parser.NewSyntaxError(blockPeeker.Err().Error(), lineNum, 0)
+		}
 		return nil, nil
 	}
 
