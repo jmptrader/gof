@@ -8,12 +8,12 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("DeclarationStatement", func() {
+var _ = Describe("LetStatement", func() {
 	var statementParser StatementParser
 	var factory *StatementFactory
 
 	BeforeEach(func() {
-		statementParser = NewDeclarationParser()
+		statementParser = NewLetParser()
 		returnStatement := NewReturnStatementParser()
 		factory = NewStatementFactory(statementParser, returnStatement)
 	})
@@ -22,7 +22,7 @@ var _ = Describe("DeclarationStatement", func() {
 		It("Should pick out any declaration", func() {
 			code := "a = b + 9"
 			d, err := statementParser.Parse(code, 0, nil, factory)
-			ds := d.(*DeclarationStatement)
+			ds := d.(*LetStatement)
 			Expect(err).To(BeNil())
 			Expect(ds).ToNot(BeNil())
 			Expect(ds.VariableName()).To(Equal("a"))
@@ -31,7 +31,7 @@ var _ = Describe("DeclarationStatement", func() {
 		It("Should pick out a multi-lined declaration", func() {
 			code := "a = b + 9\n\t+ 6"
 			d, err := statementParser.Parse(code, 0, nil, factory)
-			ds := d.(*DeclarationStatement)
+			ds := d.(*LetStatement)
 			Expect(err).To(BeNil())
 			Expect(ds).ToNot(BeNil())
 			Expect(ds.VariableName()).To(Equal("a"))

@@ -66,7 +66,7 @@ func verifyInnerStatements(innerStatements []Statement, line int) parser.SyntaxE
 		return parser.NewSyntaxError("Last statement in function is not a returnable statement", line, 0)
 	} else {
 		for _, s := range innerStatements[:numOfStatements-1] {
-			if _, ok := s.(*DeclarationStatement); !ok {
+			if _, ok := s.(*LetStatement); !ok {
 				return parser.NewSyntaxError("Only the last statement in function can be a returnable statement", line, 0)
 			}
 		}

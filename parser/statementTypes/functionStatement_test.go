@@ -14,7 +14,7 @@ var _ = Describe("FunctionStatement", func() {
 	var factory *StatementFactory
 	BeforeEach(func() {
 		retParser := NewReturnStatementParser()
-		declParser := NewDeclarationParser()
+		declParser := NewLetParser()
 		statementParser = NewFunctionStatementParser()
 		factory = NewStatementFactory(declParser, statementParser, retParser)
 	})

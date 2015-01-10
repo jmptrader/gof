@@ -6,19 +6,19 @@ import (
 	"github.com/apoydence/gof/parser/expressionParsing"
 )
 
-type DeclarationStatement struct {
+type LetStatement struct {
 	varName        string
 	code           string
 	innerStatement Statement
 	lineNum        int
 }
 
-func NewDeclarationParser() StatementParser {
-	return DeclarationStatement{}
+func NewLetParser() StatementParser {
+	return LetStatement{}
 }
 
-func newDeclarationStatement(varName, code string, lineNum int, innerStatement Statement) Statement {
-	return &DeclarationStatement{
+func newLetStatement(varName, code string, lineNum int, innerStatement Statement) Statement {
+	return &LetStatement{
 		varName:        varName,
 		code:           code,
 		innerStatement: innerStatement,
@@ -26,7 +26,7 @@ func newDeclarationStatement(varName, code string, lineNum int, innerStatement S
 	}
 }
 
-func (ds DeclarationStatement) Parse(block string, lineNum int, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) (Statement, parser.SyntaxError) {
+func (ds LetStatement) Parse(block string, lineNum int, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) (Statement, parser.SyntaxError) {
 	lines := parser.Lines(block)
 
 	ok, varName, restOfLine := splitEquals(lines[0])
@@ -38,7 +38,7 @@ func (ds DeclarationStatement) Parse(block string, lineNum int, nextBlockScanner
 		if err != nil {
 			return nil, err
 		}
-		return newDeclarationStatement(varName, combinedLine, lineNum, st), nil
+		return newLetStatement(varName, combinedLine, lineNum, st), nil
 	}
 
 	return nil, nil
@@ -72,7 +72,7 @@ func combineBlock(firstLine string, lines []string) string {
 	return result
 }
 
-func (ds *DeclarationStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, parser.SyntaxError) {
+func (ds *LetStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, parser.SyntaxError) {
 	innerCode, returnType, synErr := ds.innerStatement.GenerateGo(fm.NextScopeLayer())
 
 	if synErr != nil {
@@ -90,14 +90,14 @@ func (ds *DeclarationStatement) GenerateGo(fm expressionParsing.FunctionMap) (st
 	return genCode, returnType, nil
 }
 
-func (ds *DeclarationStatement) VariableName() string {
+func (ds *LetStatement) VariableName() string {
 	return ds.varName
 }
 
-func (ds *DeclarationStatement) CodeBlock() string {
+func (ds *LetStatement) CodeBlock() string {
 	return ds.code
 }
 
-func (ds *DeclarationStatement) LineNumber() int {
+func (ds *LetStatement) LineNumber() int {
 	return ds.lineNum
 }
