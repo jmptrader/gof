@@ -20,7 +20,7 @@ var _ = Describe("LetStatement", func() {
 	Context("Parse", func() {
 
 		It("Should pick out any declaration", func() {
-			code := "a = b + 9"
+			code := "let a = b + 9"
 			d, err := statementParser.Parse(code, 0, nil, factory)
 			ds := d.(*LetStatement)
 			Expect(err).To(BeNil())
@@ -29,7 +29,7 @@ var _ = Describe("LetStatement", func() {
 			Expect(ds.CodeBlock()).To(Equal("b + 9"))
 		})
 		It("Should pick out a multi-lined declaration", func() {
-			code := "a = b + 9\n\t+ 6"
+			code := "let a = b + 9\n\t+ 6"
 			d, err := statementParser.Parse(code, 0, nil, factory)
 			ds := d.(*LetStatement)
 			Expect(err).To(BeNil())
@@ -46,7 +46,7 @@ var _ = Describe("LetStatement", func() {
 	})
 	Context("GenerateGo", func() {
 		It("Should return proper go code", func() {
-			code := "a = 9 + 6"
+			code := "let a = 9 + 6"
 			d, err := statementParser.Parse(code, 0, nil, factory)
 			fm := expressionParsing.NewFunctionMap()
 			gocode, returnType, err := d.GenerateGo(fm)

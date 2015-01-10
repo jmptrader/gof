@@ -47,11 +47,13 @@ func (ds LetStatement) Parse(block string, lineNum int, nextBlockScanner *parser
 func splitEquals(line string) (bool, string, string) {
 	var varName string
 	var rest string
+	var let string
 	var equals string
-	varName, rest = parser.Tokenize(line)
+	let, rest = parser.Tokenize(line)
+	varName, rest = parser.Tokenize(rest)
 	equals, rest = parser.Tokenize(rest)
 
-	if equals == "=" {
+	if let == "let" && equals == "=" {
 		return true, varName, rest
 	}
 

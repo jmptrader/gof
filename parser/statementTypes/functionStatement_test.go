@@ -45,7 +45,7 @@ var _ = Describe("FunctionStatement", func() {
 		})
 		It("Should generate a proper Go function with multiple inner statements", func() {
 			fm := expressionParsing.NewFunctionMap()
-			code := "func addTogether -> a int32 -> b int32 -> c int32 -> int32\n\td = 6\n\ta + b + c + d"
+			code := "func addTogether -> a int32 -> b int32 -> c int32 -> int32\n\tlet d = 6\n\ta + b + c + d"
 			f, err := statementParser.Parse(code, 0, nil, factory)
 			Expect(err).To(BeNil())
 			code, _, err = f.GenerateGo(fm)
@@ -55,7 +55,7 @@ var _ = Describe("FunctionStatement", func() {
 	})
 	Context("Proper statement structure", func() {
 		It("Should end in a return statement", func() {
-			code := "func addTogether -> a int32 -> b int32 -> c int32 -> int32\n\td = 6"
+			code := "func addTogether -> a int32 -> b int32 -> c int32 -> int32\n\tlet d = 6"
 			_, err := statementParser.Parse(code, 0, nil, factory)
 			Expect(err).ToNot(BeNil())
 		})
