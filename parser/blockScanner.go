@@ -16,9 +16,10 @@ type BlockScanner struct {
 	blockLine int
 }
 
-func NewBlockScanner(code io.Reader) *BlockScanner {
+func NewBlockScanner(code io.Reader, startingLine int) *BlockScanner {
 	return &BlockScanner{
 		scanner: bufio.NewScanner(code),
+		line:    startingLine,
 	}
 }
 

@@ -26,8 +26,8 @@ func NewScanPeeker(scanner Scanner) *ScanPeeker {
 	}
 }
 
-func NewScanPeekerStr(block string) *ScanPeeker {
-	return NewScanPeeker(NewBlockScanner(strings.NewReader(block), nil))
+func NewScanPeekerStr(block string, startingLine int) *ScanPeeker {
+	return NewScanPeeker(NewBlockScanner(strings.NewReader(block), startingLine))
 }
 
 func (sp *ScanPeeker) Peek() (bool, string, int) {

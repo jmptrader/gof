@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/apoydence/gof/parser"
 	"github.com/apoydence/gof/tool/generate"
 	"io/ioutil"
 	"os"
@@ -43,7 +44,8 @@ func generateCmd() {
 	}
 
 	if err := filepath.Walk(p, walkFunc); err != nil {
-		fmt.Println("Error: ", err.Error())
+		synErr := err.(parser.SyntaxError)
+		fmt.Printf("Error (Line %d): %s\n", synErr.Line(), synErr.Error())
 		os.Exit(1)
 	}
 }

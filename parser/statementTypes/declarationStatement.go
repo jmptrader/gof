@@ -33,7 +33,7 @@ func (ds DeclarationStatement) Parse(block string, lineNum int, nextBlockScanner
 
 	if ok {
 		combinedLine := combineBlock(restOfLine, lines[1:])
-		peeker := parser.NewScanPeekerStr(combinedLine)
+		peeker := parser.NewScanPeekerStr(combinedLine, lineNum)
 		st, err := factory.Read(peeker)
 		if err != nil {
 			return nil, err

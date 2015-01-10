@@ -8,7 +8,7 @@ import (
 )
 
 func GofToGo(reader io.Reader, writer io.Writer) error {
-	bs := parser.NewBlockScanner(reader, nil)
+	bs := parser.NewBlockScanner(reader, 1)
 	bp := parser.NewScanPeeker(bs)
 	factory := statementTypes.NewStatementFactory(fetchStatementParsers()...)
 	funcMap := expressionParsing.NewFunctionMap()

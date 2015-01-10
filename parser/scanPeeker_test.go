@@ -10,7 +10,7 @@ import (
 var _ = Describe("ScanPeeker", func() {
 	Context("Read", func() {
 		It("Reads a one liner", func() {
-			sp := NewScanPeekerStr("abc")
+			sp := NewScanPeekerStr("abc", 0)
 
 			ok, value, line := sp.Read()
 			Expect(ok).To(BeTrue())
@@ -18,7 +18,7 @@ var _ = Describe("ScanPeeker", func() {
 			Expect(line).To(Equal(0))
 		})
 		It("Reads multiple lines", func() {
-			sp := NewScanPeekerStr("a\nb\nc")
+			sp := NewScanPeekerStr("a\nb\nc", 0)
 
 			ok, value, line := sp.Read()
 			Expect(ok).To(BeTrue())
@@ -38,32 +38,32 @@ var _ = Describe("ScanPeeker", func() {
 	})
 	Context("Peek", func() {
 		It("Reads from the scanner without removing it", func() {
-			sp := NewScanPeekerStr("a\nb\nc")
+			sp := NewScanPeekerStr("a\nb\nc", 9)
 
 			ok, value, line := sp.Peek()
 			Expect(ok).To(BeTrue())
 			Expect(value).To(Equal("a"))
-			Expect(line).To(Equal(0))
+			Expect(line).To(Equal(9))
 
 			ok, value, line = sp.Read()
 			Expect(ok).To(BeTrue())
 			Expect(value).To(Equal("a"))
-			Expect(line).To(Equal(0))
+			Expect(line).To(Equal(9))
 
 			ok, value, line = sp.Peek()
 			Expect(ok).To(BeTrue())
 			Expect(value).To(Equal("b"))
-			Expect(line).To(Equal(1))
+			Expect(line).To(Equal(10))
 
 			ok, value, line = sp.Read()
 			Expect(ok).To(BeTrue())
 			Expect(value).To(Equal("b"))
-			Expect(line).To(Equal(1))
+			Expect(line).To(Equal(10))
 
 			ok, value, line = sp.Read()
 			Expect(ok).To(BeTrue())
 			Expect(value).To(Equal("c"))
-			Expect(line).To(Equal(2))
+			Expect(line).To(Equal(11))
 
 			ok, _, _ = sp.Read()
 			Expect(ok).To(BeFalse())

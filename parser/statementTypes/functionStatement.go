@@ -45,7 +45,7 @@ func (fs FunctionStatement) Parse(block string, lineNum int, nextBlockScanner *p
 		return nil, err
 	}
 
-	innerStatements, err := fetchInnerStatements(parser.RemoveTabs(lines[1:]), factory)
+	innerStatements, err := fetchInnerStatements(parser.RemoveTabs(lines[1:]), factory, lineNum+1)
 	if err != nil {
 		return nil, err
 	}
@@ -55,8 +55,8 @@ func (fs FunctionStatement) Parse(block string, lineNum int, nextBlockScanner *p
 	return newFunctionStatement(name, lineNum, typeDef, innerStatements), nil
 }
 
-func fetchInnerStatements(lines []string, factory *StatementFactory) ([]Statement, parser.SyntaxError) {
-	scanner := parser.NewScanPeekerStr(parser.FromLines(lines))
+func fetchInnerStatements(lines []string, factory *StatementFactory, lineNum int) ([]Statement, parser.SyntaxError) {
+	scanner := parser.NewScanPeekerStr(parser.FromLines(lines), lineNum)
 	statements := make([]Statement, 0)
 	next := func() (Statement, parser.SyntaxError) {
 		return factory.Read(scanner)

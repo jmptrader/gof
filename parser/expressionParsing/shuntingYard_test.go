@@ -12,7 +12,7 @@ var _ = Describe("ShuntingYard", func() {
 		It("Should put the expression into RPN", func() {
 			exp := "( 5 + 9 ) * 8 / 3 - 2"
 			fm := NewFunctionMap()
-			ops, err := ToRpn(exp, fm)
+			ops, err := ToRpn(exp, 9, fm)
 			Expect(err).To(BeNil())
 			Expect(ops).To(Equal([]string{"5", "9", "+", "8", "*", "3", "/", "2", "-"}))
 		})
@@ -25,7 +25,7 @@ var _ = Describe("ShuntingYard", func() {
 			f1 := NewFuncTypeDefinition("", intType, intType)
 			f2 := NewFuncTypeDefinition("", intType, f1)
 			_, _ = fm.AddFunction("a", f2)
-			ops, err := ToRpn(exp, fm)
+			ops, err := ToRpn(exp, 9, fm)
 			Expect(err).To(BeNil())
 			Expect(ops).To(Equal([]string{"5", "9", "+", "100", "200", "a", "*", "3", "/", "2", "-"}))
 		})

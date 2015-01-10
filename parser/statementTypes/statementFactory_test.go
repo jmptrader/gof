@@ -17,7 +17,7 @@ var _ = Describe("StatementFactory", func() {
 
 		It("Should return the first statement that matches the block", func() {
 			code := strings.NewReader("match\n\tblah\n\tblah\n")
-			bs := parser.NewBlockScanner(code, nil)
+			bs := parser.NewBlockScanner(code, 0)
 			bp := parser.NewScanPeeker(bs)
 			sf := NewStatementFactory(msIf, msMatch)
 
@@ -29,7 +29,7 @@ var _ = Describe("StatementFactory", func() {
 
 		It("Should return nil if it doesn't match a statement", func() {
 			code := strings.NewReader("something\n\tblah\n\tblah\n")
-			bs := parser.NewBlockScanner(code, nil)
+			bs := parser.NewBlockScanner(code, 0)
 			bp := parser.NewScanPeeker(bs)
 			sf := NewStatementFactory(msIf, msMatch)
 
@@ -40,7 +40,7 @@ var _ = Describe("StatementFactory", func() {
 
 		It("Should be able to read multiple statements", func() {
 			code := strings.NewReader("match\n\tblah\n\tblah\nif\n\tfoo")
-			bs := parser.NewBlockScanner(code, nil)
+			bs := parser.NewBlockScanner(code, 0)
 			bp := parser.NewScanPeeker(bs)
 			sf := NewStatementFactory(msIf, msMatch)
 
