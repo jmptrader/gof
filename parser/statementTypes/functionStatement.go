@@ -50,9 +50,29 @@ func (fs FunctionStatement) Parse(block string, lineNum int, nextBlockScanner *p
 		return nil, err
 	}
 
-	// CHECK TO SEE IF THE LAST STATEMENT IS A DECLARATION
+	err = verifyInnerStatements(innerStatements, lineNum)
+	if err != nil {
+		return nil, err
+	}
 
 	return newFunctionStatement(name, lineNum, typeDef, innerStatements), nil
+}
+
+func verifyInnerStatements(innerStatements []Statement, line int) parser.SyntaxError {
+	numOfStatements := len(innerStatements)
+	if numOfStatements == 0 {
+		return parser.NewSyntaxError("No inner statement found", line, 0)
+	} else if _, ok := innerStatements[numOfStatements-1].(*ReturnStatement); !ok {
+		return parser.NewSyntaxError("Last statement in function is not a returnable statement", line, 0)
+	} else {
+		for _, s := range innerStatements[:numOfStatements-1] {
+			if _, ok := s.(*DeclarationStatement); !ok {
+				return parser.NewSyntaxError("Only the last statement in function can be a returnable statement", line, 0)
+			}
+		}
+	}
+
+	return nil
 }
 
 func fetchInnerStatements(lines []string, factory *StatementFactory, lineNum int) ([]Statement, parser.SyntaxError) {

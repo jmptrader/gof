@@ -53,6 +53,18 @@ var _ = Describe("FunctionStatement", func() {
 			Expect(matchCode(code, "func addTogether (a int32) func (b int32) func (c int32) int32{\n\treturn func (b int32) func (c int32) int32 {\n\t\treturn func (c int32) int32 {\n\t\t\t\n\t\t\tvar d func() int32\nd = func(){return 6}return (((a+b)+c)+d())\n\t\t}\n\t}\n}")).To(BeTrue())
 		})
 	})
+	Context("Proper statement structure", func() {
+		It("Should end in a return statement", func() {
+			code := "func addTogether -> a int32 -> b int32 -> c int32 -> int32\n\td = 6"
+			_, err := statementParser.Parse(code, 0, nil, factory)
+			Expect(err).ToNot(BeNil())
+		})
+		It("Should only have declaration statement at the beginning", func() {
+			code := "func addTogether -> a int32 -> b int32 -> c int32 -> int32\n\ta + 6\n\tb + c"
+			_, err := statementParser.Parse(code, 0, nil, factory)
+			Expect(err).ToNot(BeNil())
+		})
+	})
 })
 
 func matchCode(codeA, codeB string) bool {
