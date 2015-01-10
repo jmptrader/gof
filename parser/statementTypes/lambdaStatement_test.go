@@ -9,20 +9,20 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("FunctionStatement", func() {
+var _ = Describe("LambdaStatement", func() {
 	var statementParser StatementParser
 	var factory *StatementFactory
 	BeforeEach(func() {
 		retParser := NewReturnStatementParser()
 		declParser := NewLetParser()
-		statementParser = NewFunctionStatementParser()
+		statementParser = NewLambdaStatementParser()
 		factory = NewStatementFactory(declParser, statementParser, retParser)
 	})
 	Context("Parse", func() {
 		It("Should distinguish a function statement", func() {
 			code := "func someName -> a A -> b B -> int32\n\t5+9"
 			f, err := statementParser.Parse(code, 0, nil, factory)
-			fs := f.(*FunctionStatement)
+			fs := f.(*LambdaStatement)
 			Expect(err).To(BeNil())
 			Expect(fs).ToNot(BeNil())
 			Expect(fs.FuncName).To(Equal("someName"))

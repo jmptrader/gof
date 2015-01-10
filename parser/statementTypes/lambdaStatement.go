@@ -13,19 +13,19 @@ func init() {
 	funcDeclRegex = regexp.MustCompile("^func\\s+(?P<name>[a-zA-Z]\\w*)\\s+(?P<typeDef>((\\s*->\\s*[a-zA-Z]\\w*\\s+[a-zA-Z]\\w*)+)((\\s+->\\s*[a-zA-Z]\\w*)))$")
 }
 
-type FunctionStatement struct {
+type LambdaStatement struct {
 	FuncName        string
 	TypeDef         expressionParsing.TypeDefinition
 	InnerStatements []Statement
 	lineNum         int
 }
 
-func NewFunctionStatementParser() StatementParser {
-	return FunctionStatement{}
+func NewLambdaStatementParser() StatementParser {
+	return LambdaStatement{}
 }
 
-func newFunctionStatement(name string, lineNum int, typeDef expressionParsing.FuncTypeDefinition, inner []Statement) Statement {
-	return &FunctionStatement{
+func newLambdaStatement(name string, lineNum int, typeDef expressionParsing.FuncTypeDefinition, inner []Statement) Statement {
+	return &LambdaStatement{
 		FuncName:        name,
 		TypeDef:         typeDef,
 		InnerStatements: inner,
@@ -33,7 +33,7 @@ func newFunctionStatement(name string, lineNum int, typeDef expressionParsing.Fu
 	}
 }
 
-func (fs FunctionStatement) Parse(block string, lineNum int, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) (Statement, parser.SyntaxError) {
+func (fs LambdaStatement) Parse(block string, lineNum int, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) (Statement, parser.SyntaxError) {
 	lines := parser.Lines(block)
 	name, typeDefStr, ok := fetchParts(lines[0])
 	if !ok {
@@ -55,7 +55,7 @@ func (fs FunctionStatement) Parse(block string, lineNum int, nextBlockScanner *p
 		return nil, err
 	}
 
-	return newFunctionStatement(name, lineNum, typeDef, innerStatements), nil
+	return newLambdaStatement(name, lineNum, typeDef, innerStatements), nil
 }
 
 func verifyInnerStatements(innerStatements []Statement, line int) parser.SyntaxError {
@@ -111,7 +111,7 @@ func fetchParts(code string) (string, string, bool) {
 	return match[groupIndex["name"]], match[groupIndex["typeDef"]], true
 }
 
-func (fs *FunctionStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, parser.SyntaxError) {
+func (fs *LambdaStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, parser.SyntaxError) {
 	fm.AddFunction(fs.FuncName, fs.TypeDef)
 	innerScope := fm.NextScopeLayer()
 	setupFuncMap(innerScope, fs.TypeDef.(expressionParsing.FuncTypeDefinition))
@@ -122,7 +122,7 @@ func (fs *FunctionStatement) GenerateGo(fm expressionParsing.FunctionMap) (strin
 	return fmt.Sprintf("func %s %s{\n\t%s\n}", fs.FuncName, generateTypeDef(true, fs.TypeDef), generateInnerFunc(fs.TypeDef, 1, inner)), fs.TypeDef, nil
 }
 
-func (fs *FunctionStatement) LineNumber() int {
+func (fs *LambdaStatement) LineNumber() int {
 	return fs.lineNum
 }
 
