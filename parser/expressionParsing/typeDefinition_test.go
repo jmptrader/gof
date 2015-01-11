@@ -28,6 +28,7 @@ var _ = Describe("TypeDefinition", func() {
 			Expect(f2.Argument().Name()).To(BeEquivalentTo("int32"))
 			Expect(f2.ArgumentName()).To(Equal("m"))
 			Expect(f2.ReturnType().Name()).To(BeEquivalentTo("int32"))
+			Expect(fd.GenGo()).To(Equal("func(n int32) func(m int32) int32"))
 		})
 	})
 })

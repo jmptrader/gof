@@ -21,6 +21,7 @@ type TypeDefinition interface {
 	IsFunc() bool
 	ReturnType() TypeDefinition
 	Name() TypeName
+	GenGo() string
 }
 
 type FuncTypeDefinition interface {
@@ -129,6 +130,10 @@ func (f *funcTypeDefinition) ReturnType() TypeDefinition {
 	return f.returnType
 }
 
+func (f *funcTypeDefinition) GenGo() string {
+	return fmt.Sprintf("func(%s %s) %s", f.ArgumentName(), f.Argument().GenGo(), f.returnType.GenGo())
+}
+
 func (f *funcTypeDefinition) FuncName() string {
 	return f.name
 }
@@ -147,4 +152,8 @@ func (p PrimTypeDefinition) ReturnType() TypeDefinition {
 
 func (p PrimTypeDefinition) Name() TypeName {
 	return p.name
+}
+
+func (p PrimTypeDefinition) GenGo() string {
+	return string(p.name)
 }
