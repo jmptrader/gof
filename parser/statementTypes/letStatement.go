@@ -11,10 +11,17 @@ type LetStatement struct {
 	code           string
 	innerStatement Statement
 	lineNum        int
+	packageLevel   bool
 }
 
 func NewLetParser() StatementParser {
 	return LetStatement{}
+}
+
+func NewPackageLetParser() StatementParser {
+	return LetStatement{
+		packageLevel: true,
+	}
 }
 
 func newLetStatement(varName, code string, lineNum int, innerStatement Statement) Statement {
@@ -32,7 +39,9 @@ func (ds LetStatement) Parse(block string, lineNum int, nextBlockScanner *parser
 	ok, varName, restOfLine := splitEquals(lines[0])
 
 	if ok {
-		//combinedLine := combineBlock(restOfLine, lines[1:])
+		if ds.packageLevel {
+			factory = adjustFactory(varName, factory)
+		}
 		combinedLine := parser.FromLines(append([]string{restOfLine}, lines[1:]...))
 		peeker := parser.NewScanPeekerStr(combinedLine, lineNum)
 		st, err := factory.Read(peeker)
@@ -42,7 +51,26 @@ func (ds LetStatement) Parse(block string, lineNum int, nextBlockScanner *parser
 		return newLetStatement(varName, combinedLine, lineNum, st), nil
 	}
 
-	return nil, nil
+	if ds.packageLevel {
+		return nil, parser.NewSyntaxError(fmt.Sprintf("Unknown statement: %s", lines[0]), lineNum, 0)
+	} else {
+		return nil, nil
+	}
+}
+
+func adjustFactory(name string, factory *StatementFactory) *StatementFactory {
+	sps := make([]StatementParser, 0)
+	for _, s := range factory.statements {
+		if _, ok := s.(LetStatement); ok {
+			sps = append(sps, NewLetParser())
+		} else if _, ok := s.(LambdaStatement); ok {
+			sps = append(sps, NewPackageLambdaStatementParser(name))
+		} else {
+			sps = append(sps, s)
+		}
+	}
+
+	return NewStatementFactory(sps...)
 }
 
 func splitEquals(line string) (bool, string, string) {
@@ -97,7 +125,11 @@ func (ds *LetStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, ex
 
 	var genCode string
 	if returnType.IsFunc() {
-		genCode = fmt.Sprintf("var %s %s\n%s = %s", name, returnType.GenGo(), name, innerCode)
+		if ls, ok := ds.innerStatement.(*LambdaStatement); ok && ls.packageLevel {
+			genCode = innerCode
+		} else {
+			genCode = fmt.Sprintf("var %s %s\n%s = %s", name, returnType.GenGo(), name, innerCode)
+		}
 	} else {
 		genCode = fmt.Sprintf("var %s func() %s\n%s = func(){\n\treturn %s\n}", name, returnType.GenGo(), name, innerCode)
 	}
