@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/apoydence/gof/parser"
 	"regexp"
+	"strings"
 )
 
 var funcArgTypeRegexp *regexp.Regexp
@@ -11,7 +12,7 @@ var funcRetTypeRegexp *regexp.Regexp
 
 func init() {
 	funcArgTypeRegexp = regexp.MustCompile("((?P<argName>([a-zA-Z]\\w*))\\s+(?P<argType>([a-zA-Z]\\w*))\\s*->)")
-	funcRetTypeRegexp = regexp.MustCompile("(?P<returnType>([a-zA-Z]\\w*))$")
+	funcRetTypeRegexp = regexp.MustCompile("(?P<returnType>([a-zA-Z]\\w*))\\s*->\\s*$")
 }
 
 type TypeName string
@@ -79,8 +80,13 @@ func fetchTypes(code string) ([]argDesc, TypeName, parser.SyntaxError) {
 		groupIndex[name] = i
 	}
 
+	for i, name := range funcRetTypeRegexp.SubexpNames() {
+		groupIndex[name] = i
+	}
+
 	argsM := make(map[string]string)
 	match := funcArgTypeRegexp.FindAllStringSubmatch(code, -1)
+	retMatch := funcRetTypeRegexp.FindStringSubmatch(code)
 
 	for _, m := range match {
 		name := m[groupIndex["argName"]]
@@ -93,12 +99,13 @@ func fetchTypes(code string) ([]argDesc, TypeName, parser.SyntaxError) {
 		args = append(args, argDesc{name: name, typeName: TypeName(typeName)})
 	}
 
-	return args, TypeName(funcRetTypeRegexp.FindString(code)), nil
+	return args, TypeName(retMatch[groupIndex["returnType"]]), nil
 }
 
 func NewPrimTypeDefinition(name TypeName) TypeDefinition {
+	var trimmedName TypeName = TypeName(strings.TrimSpace(string(name)))
 	return PrimTypeDefinition{
-		name: name,
+		name: trimmedName,
 	}
 }
 

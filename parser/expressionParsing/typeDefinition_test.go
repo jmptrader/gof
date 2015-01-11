@@ -18,7 +18,7 @@ var _ = Describe("TypeDefinition", func() {
 	})
 	Context("ParseFuncTypeDefinition", func() {
 		It("Should return a chained FuncTypeDefinition", func() {
-			code := "n int32 -> m int32 -> int32"
+			code := "n int32 -> m int32 -> int32 ->"
 			fd, err := ParseFuncTypeDefinition(code)
 			Expect(err).To(BeNil())
 			Expect(fd).ToNot(BeNil())

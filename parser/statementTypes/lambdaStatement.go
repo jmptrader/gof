@@ -7,10 +7,10 @@ import (
 	"regexp"
 )
 
-var funcDeclRegex *regexp.Regexp
+var lambdaRegex *regexp.Regexp
 
 func init() {
-	funcDeclRegex = regexp.MustCompile("^func\\s+(?P<typeDef>((\\s*->\\s*[a-zA-Z]\\w*\\s+[a-zA-Z]\\w*)+)((\\s+->\\s*[a-zA-Z]\\w*)))$")
+	lambdaRegex = regexp.MustCompile("func\\s+(?P<typeDef>(\\s*[a-zA-Z]\\w*\\s+[a-zA-Z]\\w*\\s*->)+(\\s*[a-zA-Z]\\w*\\s*->))")
 }
 
 type LambdaStatement struct {
@@ -96,9 +96,9 @@ func subFetchInnerStatements(next func() (Statement, parser.SyntaxError), statem
 }
 
 func fetchParts(code string) (string, bool) {
-	match := funcDeclRegex.FindStringSubmatch(code)
+	match := lambdaRegex.FindStringSubmatch(code)
 	groupIndex := make(map[string]int)
-	for i, name := range funcDeclRegex.SubexpNames() {
+	for i, name := range lambdaRegex.SubexpNames() {
 		groupIndex[name] = i
 	}
 
