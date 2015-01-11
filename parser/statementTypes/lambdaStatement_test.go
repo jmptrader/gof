@@ -19,8 +19,19 @@ var _ = Describe("LambdaStatement", func() {
 		factory = NewStatementFactory(declParser, statementParser, retParser)
 	})
 	Context("Parse", func() {
-		It("Should distinguish a function statement", func() {
+		It("Should distinguish a lambda statement", func() {
 			code := "func a A -> b B -> int32 ->\n\t5+9"
+			f, err := statementParser.Parse(code, 0, nil, factory)
+			Expect(f).ToNot(BeNil())
+			fs := f.(*LambdaStatement)
+			Expect(err).To(BeNil())
+			Expect(fs).ToNot(BeNil())
+			Expect(fs.TypeDef.Name()).To(BeEquivalentTo("a A->b B->int32"))
+			Expect(fs.InnerStatements).ToNot(BeNil())
+			Expect(fs.InnerStatements).To(HaveLen(1))
+		})
+		It("Should distinguish a single line lambda statement", func() {
+			code := "func a A -> b B -> int32 -> 5+9"
 			f, err := statementParser.Parse(code, 0, nil, factory)
 			Expect(f).ToNot(BeNil())
 			fs := f.(*LambdaStatement)

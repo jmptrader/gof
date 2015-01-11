@@ -5,12 +5,13 @@ import (
 	"github.com/apoydence/gof/parser"
 	"github.com/apoydence/gof/parser/expressionParsing"
 	"regexp"
+	"strings"
 )
 
 var lambdaRegex *regexp.Regexp
 
 func init() {
-	lambdaRegex = regexp.MustCompile("func\\s+(?P<typeDef>(\\s*[a-zA-Z]\\w*\\s+[a-zA-Z]\\w*\\s*->)+(\\s*[a-zA-Z]\\w*\\s*->))")
+	lambdaRegex = regexp.MustCompile("func\\s+(?P<typeDef>(\\s*[a-zA-Z]\\w*\\s+[a-zA-Z]\\w*\\s*->)+(\\s*[a-zA-Z]\\w*\\s*->))\\s*(?P<rest>[\\w\\W]*)")
 }
 
 type LambdaStatement struct {
@@ -45,9 +46,19 @@ func newLambdaStatement(lineNum int, typeDef expressionParsing.FuncTypeDefinitio
 func (fs LambdaStatement) Parse(block string, lineNum int, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) (Statement, parser.SyntaxError) {
 	lines := parser.Lines(block)
 	factory = fetchNewFactory(factory)
-	typeDefStr, ok := fetchParts(lines[0])
+	typeDefStr, rest, ok := fetchParts(lines[0])
 	if !ok {
 		return nil, nil
+	}
+
+	var codeBlock []string
+	if len(strings.TrimSpace(rest)) > 0 {
+		if len(lines) > 1 {
+			return nil, parser.NewSyntaxError("Inline lambdas can only be one line", lineNum, 0)
+		}
+		codeBlock = []string{rest}
+	} else {
+		codeBlock = parser.RemoveTabs(lines[1:])
 	}
 
 	typeDef, err := expressionParsing.ParseFuncTypeDefinition(typeDefStr)
@@ -55,7 +66,7 @@ func (fs LambdaStatement) Parse(block string, lineNum int, nextBlockScanner *par
 		return nil, err
 	}
 
-	innerStatements, err := fetchInnerStatements(parser.RemoveTabs(lines[1:]), factory, lineNum+1)
+	innerStatements, err := fetchInnerStatements(codeBlock, factory, lineNum+1)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +130,7 @@ func subFetchInnerStatements(next func() (Statement, parser.SyntaxError), statem
 	return statements, nil
 }
 
-func fetchParts(code string) (string, bool) {
+func fetchParts(code string) (string, string, bool) {
 	match := lambdaRegex.FindStringSubmatch(code)
 	groupIndex := make(map[string]int)
 	for i, name := range lambdaRegex.SubexpNames() {
@@ -127,10 +138,10 @@ func fetchParts(code string) (string, bool) {
 	}
 
 	if match == nil {
-		return "", false
+		return "", "", false
 	}
 
-	return match[groupIndex["typeDef"]], true
+	return match[groupIndex["typeDef"]], match[groupIndex["rest"]], true
 }
 
 func (fs *LambdaStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, parser.SyntaxError) {
