@@ -2,4 +2,5 @@ let mult = func a int32 -> b int32 -> int32 ->
 	a * b
 
 let Action = func a int32 -> b int32 -> c int32 -> int32 ->
-	mult a b + c
+	let x = func y int32 -> int32 -> y + a
+	mult a b + c + x b
