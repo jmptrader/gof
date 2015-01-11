@@ -10,11 +10,10 @@ import (
 var funcDeclRegex *regexp.Regexp
 
 func init() {
-	funcDeclRegex = regexp.MustCompile("^func\\s+(?P<name>[a-zA-Z]\\w*)\\s+(?P<typeDef>((\\s*->\\s*[a-zA-Z]\\w*\\s+[a-zA-Z]\\w*)+)((\\s+->\\s*[a-zA-Z]\\w*)))$")
+	funcDeclRegex = regexp.MustCompile("^func\\s+(?P<typeDef>((\\s*->\\s*[a-zA-Z]\\w*\\s+[a-zA-Z]\\w*)+)((\\s+->\\s*[a-zA-Z]\\w*)))$")
 }
 
 type LambdaStatement struct {
-	FuncName        string
 	TypeDef         expressionParsing.TypeDefinition
 	InnerStatements []Statement
 	lineNum         int
@@ -24,9 +23,8 @@ func NewLambdaStatementParser() StatementParser {
 	return LambdaStatement{}
 }
 
-func newLambdaStatement(name string, lineNum int, typeDef expressionParsing.FuncTypeDefinition, inner []Statement) Statement {
+func newLambdaStatement(lineNum int, typeDef expressionParsing.FuncTypeDefinition, inner []Statement) Statement {
 	return &LambdaStatement{
-		FuncName:        name,
 		TypeDef:         typeDef,
 		InnerStatements: inner,
 		lineNum:         lineNum,
@@ -35,7 +33,7 @@ func newLambdaStatement(name string, lineNum int, typeDef expressionParsing.Func
 
 func (fs LambdaStatement) Parse(block string, lineNum int, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) (Statement, parser.SyntaxError) {
 	lines := parser.Lines(block)
-	name, typeDefStr, ok := fetchParts(lines[0])
+	typeDefStr, ok := fetchParts(lines[0])
 	if !ok {
 		return nil, nil
 	}
@@ -55,7 +53,7 @@ func (fs LambdaStatement) Parse(block string, lineNum int, nextBlockScanner *par
 		return nil, err
 	}
 
-	return newLambdaStatement(name, lineNum, typeDef, innerStatements), nil
+	return newLambdaStatement(lineNum, typeDef, innerStatements), nil
 }
 
 func verifyInnerStatements(innerStatements []Statement, line int) parser.SyntaxError {
@@ -97,7 +95,7 @@ func subFetchInnerStatements(next func() (Statement, parser.SyntaxError), statem
 	return statements, nil
 }
 
-func fetchParts(code string) (string, string, bool) {
+func fetchParts(code string) (string, bool) {
 	match := funcDeclRegex.FindStringSubmatch(code)
 	groupIndex := make(map[string]int)
 	for i, name := range funcDeclRegex.SubexpNames() {
@@ -105,21 +103,21 @@ func fetchParts(code string) (string, string, bool) {
 	}
 
 	if match == nil {
-		return "", "", false
+		return "", false
 	}
 
-	return match[groupIndex["name"]], match[groupIndex["typeDef"]], true
+	return match[groupIndex["typeDef"]], true
 }
 
 func (fs *LambdaStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, parser.SyntaxError) {
-	fm.AddFunction(fs.FuncName, fs.TypeDef)
+	//fm.AddFunction(fs.FuncName, fs.TypeDef)
 	innerScope := fm.NextScopeLayer()
 	setupFuncMap(innerScope, fs.TypeDef.(expressionParsing.FuncTypeDefinition))
 	inner, err := generateInnerGo(innerScope, fs.InnerStatements)
 	if err != nil {
 		return "", nil, err
 	}
-	return fmt.Sprintf("func %s %s{\n\t%s\n}", fs.FuncName, generateTypeDef(true, fs.TypeDef), generateInnerFunc(fs.TypeDef, 1, inner)), fs.TypeDef, nil
+	return fmt.Sprintf("func %s{\n\t%s\n}", generateTypeDef(true, fs.TypeDef), generateInnerFunc(fs.TypeDef, 1, inner)), fs.TypeDef, nil
 }
 
 func (fs *LambdaStatement) LineNumber() int {
