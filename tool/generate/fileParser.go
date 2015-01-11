@@ -43,7 +43,7 @@ func writeGeneratedBlocks(factory *statementTypes.StatementFactory, peeker *pars
 
 func fetchStatementParsers() []statementTypes.StatementParser {
 	s := make([]statementTypes.StatementParser, 0)
-	s = append(s, statementTypes.NewLetParser())
+	s = append(s, statementTypes.NewPackageLetParser())
 	s = append(s, statementTypes.NewLambdaStatementParser())
 	s = append(s, statementTypes.NewReturnStatementParser())
 	return s
