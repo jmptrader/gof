@@ -1,5 +1,5 @@
-func mult -> a int32 -> b int32 -> int32
+let mult = func a int32 -> b int32 -> int32 ->
 	a * b
 
-func Action -> a int32 -> b int32 -> c int32 -> int32
+let Action = func a int32 -> b int32 -> c int32 -> int32 ->
 	mult a b + c
