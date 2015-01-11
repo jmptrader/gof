@@ -26,16 +26,7 @@ var _ = Describe("LetStatement", func() {
 			Expect(err).To(BeNil())
 			Expect(ds).ToNot(BeNil())
 			Expect(ds.VariableName()).To(Equal("a"))
-			Expect(ds.CodeBlock()).To(Equal("b + 9"))
-		})
-		It("Should pick out a multi-lined declaration", func() {
-			code := "let a = b + 9\n\t+ 6"
-			d, err := statementParser.Parse(code, 0, nil, factory)
-			ds := d.(*LetStatement)
-			Expect(err).To(BeNil())
-			Expect(ds).ToNot(BeNil())
-			Expect(ds.VariableName()).To(Equal("a"))
-			Expect(ds.CodeBlock()).To(Equal("b + 9 + 6"))
+			Expect(stripWhitespace(ds.CodeBlock())).To(Equal("b+9"))
 		})
 		It("Should return nil for a non declaration", func() {
 			code := "if true\n\t9\nelse\n\t10"

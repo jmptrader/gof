@@ -32,7 +32,8 @@ func (ds LetStatement) Parse(block string, lineNum int, nextBlockScanner *parser
 	ok, varName, restOfLine := splitEquals(lines[0])
 
 	if ok {
-		combinedLine := combineBlock(restOfLine, lines[1:])
+		//combinedLine := combineBlock(restOfLine, lines[1:])
+		combinedLine := parser.FromLines(append([]string{restOfLine}, lines[1:]...))
 		peeker := parser.NewScanPeekerStr(combinedLine, lineNum)
 		st, err := factory.Read(peeker)
 		if err != nil {
@@ -81,14 +82,25 @@ func (ds *LetStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, ex
 		return "", nil, synErr
 	}
 
-	fd := expressionParsing.NewFuncTypeDefinition("", nil, returnType)
+	var fd expressionParsing.FuncTypeDefinition
+	if returnType.IsFunc() {
+		fd = returnType.(expressionParsing.FuncTypeDefinition)
+	} else {
+		fd = expressionParsing.NewFuncTypeDefinition("", nil, returnType)
+	}
+
 	name, err := fm.AddFunction(ds.varName, fd)
 
 	if err != nil {
 		return "", nil, parser.NewSyntaxError(err.Error(), 0, 0)
 	}
 
-	genCode := fmt.Sprintf("var %s func() %s\n%s = func(){\n\treturn %s\n}", name, returnType.Name(), name, innerCode)
+	var genCode string
+	if returnType.IsFunc() {
+		genCode = fmt.Sprintf("var %s %s\n%s = %s", name, returnType.GenGo(), name, innerCode)
+	} else {
+		genCode = fmt.Sprintf("var %s func() %s\n%s = func(){\n\treturn %s\n}", name, returnType.GenGo(), name, innerCode)
+	}
 	return genCode, returnType, nil
 }
 

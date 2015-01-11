@@ -17,22 +17,34 @@ type LambdaStatement struct {
 	TypeDef         expressionParsing.TypeDefinition
 	InnerStatements []Statement
 	lineNum         int
+	packageLevel    bool
+	name            string
+}
+
+func NewPackageLambdaStatementParser(name string) StatementParser {
+	return LambdaStatement{
+		packageLevel: true,
+		name:         name,
+	}
 }
 
 func NewLambdaStatementParser() StatementParser {
 	return LambdaStatement{}
 }
 
-func newLambdaStatement(lineNum int, typeDef expressionParsing.FuncTypeDefinition, inner []Statement) Statement {
+func newLambdaStatement(lineNum int, typeDef expressionParsing.FuncTypeDefinition, inner []Statement, packLevel bool, name string) Statement {
 	return &LambdaStatement{
 		TypeDef:         typeDef,
 		InnerStatements: inner,
 		lineNum:         lineNum,
+		packageLevel:    packLevel,
+		name:            name,
 	}
 }
 
 func (fs LambdaStatement) Parse(block string, lineNum int, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) (Statement, parser.SyntaxError) {
 	lines := parser.Lines(block)
+	factory = fetchNewFactory(factory)
 	typeDefStr, ok := fetchParts(lines[0])
 	if !ok {
 		return nil, nil
@@ -53,7 +65,19 @@ func (fs LambdaStatement) Parse(block string, lineNum int, nextBlockScanner *par
 		return nil, err
 	}
 
-	return newLambdaStatement(lineNum, typeDef, innerStatements), nil
+	return newLambdaStatement(lineNum, typeDef, innerStatements, fs.packageLevel, fs.name), nil
+}
+
+func fetchNewFactory(factory *StatementFactory) *StatementFactory {
+	sps := make([]StatementParser, 0)
+	for _, s := range factory.statements {
+		if _, ok := s.(LambdaStatement); ok {
+			sps = append(sps, NewLambdaStatementParser())
+		} else {
+			sps = append(sps, s)
+		}
+	}
+	return NewStatementFactory(sps...)
 }
 
 func verifyInnerStatements(innerStatements []Statement, line int) parser.SyntaxError {
@@ -117,7 +141,13 @@ func (fs *LambdaStatement) GenerateGo(fm expressionParsing.FunctionMap) (string,
 	if err != nil {
 		return "", nil, err
 	}
-	return fmt.Sprintf("func %s{\n\t%s\n}", generateTypeDef(true, fs.TypeDef), generateInnerFunc(fs.TypeDef, 1, inner)), fs.TypeDef, nil
+
+	var funcName string = ""
+	if fs.packageLevel {
+		funcName = fs.name + " "
+	}
+
+	return fmt.Sprintf("func %s%s{\n\t%s\n}", funcName, generateTypeDef(true, fs.TypeDef), generateInnerFunc(fs.TypeDef, 1, inner)), fs.TypeDef, nil
 }
 
 func (fs *LambdaStatement) LineNumber() int {
