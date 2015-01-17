@@ -9,24 +9,28 @@ import (
 
 var _ = Describe("FunctionMap", func() {
 	Context("Multiple Functions", func() {
+		var intType TypeDefinition
+		var funcType TypeDefinition
+		BeforeEach(func() {
+			intType, _, _ = ParseTypeDef("int32")
+			funcType, _, _ = ParseTypeDef("func x int32 -> int32")
+		})
 		It("Should return incrementing values", func() {
 			fm := NewFunctionMap()
-			intType := NewPrimTypeDefinition("int32")
-			fi := NewFuncTypeDefinition("", intType, intType)
-			a, err := fm.AddFunction("a", fi)
+			a, err := fm.AddFunction("a", funcType)
 			Expect(err).To(BeNil())
-			b, err := fm.AddFunction("b", fi)
+			b, err := fm.AddFunction("b", funcType)
 			Expect(err).To(BeNil())
-			c, err := fm.AddFunction("c", fi)
+			c, err := fm.AddFunction("c", funcType)
 			Expect(err).To(BeNil())
 
 			Expect(a).To(Equal("a"))
 			Expect(b).To(Equal("b"))
 			Expect(c).To(Equal("c"))
 
-			Expect(fm.GetFunction("a").(FuncTypeDefinition).FuncName()).To(Equal(a))
-			Expect(fm.GetFunction("b").(FuncTypeDefinition).FuncName()).To(Equal(b))
-			Expect(fm.GetFunction("c").(FuncTypeDefinition).FuncName()).To(Equal(c))
+			Expect(fm.GetFunction("a")).To(Equal(funcType))
+			Expect(fm.GetFunction("b")).To(Equal(funcType))
+			Expect(fm.GetFunction("c")).To(Equal(funcType))
 		})
 		It("Should return null for an unknown function", func() {
 			fm := NewFunctionMap()
@@ -34,13 +38,11 @@ var _ = Describe("FunctionMap", func() {
 		})
 		It("Should return an error when add the same function name", func() {
 			fm := NewFunctionMap()
-			intType := NewPrimTypeDefinition("int32")
-			fi := NewFuncTypeDefinition("", intType, intType)
 
-			_, err := fm.AddFunction("a", fi)
+			_, err := fm.AddFunction("a", funcType)
 			Expect(err).To(BeNil())
 
-			_, err = fm.AddFunction("a", fi)
+			_, err = fm.AddFunction("a", funcType)
 			Expect(err).ToNot(BeNil())
 		})
 	})

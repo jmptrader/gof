@@ -38,10 +38,8 @@ func (fm *funcMap) AddFunction(name string, f TypeDefinition) (string, error) {
 		return "", errors.New("The function name'" + name + "' is already allocated.")
 	}
 
-	if fd, ok := f.(*funcTypeDefinition); ok {
-		clone := *fd
-		clone.name = name
-		f = &clone
+	if fd, ok := f.(FuncTypeDefinition); ok {
+		f = fd
 	}
 
 	fm.fm[name] = f

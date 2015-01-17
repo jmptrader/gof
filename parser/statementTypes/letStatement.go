@@ -110,28 +110,20 @@ func (ds *LetStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, ex
 		return "", nil, synErr
 	}
 
-	var fd expressionParsing.FuncTypeDefinition
-	if returnType.IsFunc() {
-		fd = returnType.(expressionParsing.FuncTypeDefinition)
-	} else {
-		fd = expressionParsing.NewFuncTypeDefinition("", nil, returnType)
-	}
-
-	name, err := fm.AddFunction(ds.varName, fd)
-
+	name, err := fm.AddFunction(ds.varName, returnType)
 	if err != nil {
 		return "", nil, parser.NewSyntaxError(err.Error(), 0, 0)
 	}
 
 	var genCode string
-	if returnType.IsFunc() {
+	if _, ok := returnType.(expressionParsing.FuncTypeDefinition); ok {
 		if ls, ok := ds.innerStatement.(*LambdaStatement); ok && ls.packageLevel {
 			genCode = innerCode
 		} else {
-			genCode = fmt.Sprintf("var %s %s\n%s = %s", name, returnType.GenGo(), name, innerCode)
+			genCode = fmt.Sprintf("var %s %s\n%s = %s", name, returnType.GenerateGo(), name, innerCode)
 		}
 	} else {
-		genCode = fmt.Sprintf("var %s func() %s\n%s = func(){\n\treturn %s\n}", name, returnType.GenGo(), name, innerCode)
+		genCode = fmt.Sprintf("var %s func() %s\n%s = func(){\n\treturn %s\n}", name, returnType.GenerateGo(), name, innerCode)
 	}
 	return genCode, returnType, nil
 }

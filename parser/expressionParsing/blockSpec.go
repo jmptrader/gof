@@ -22,14 +22,7 @@ func newBlockSpec(op string, valueType TypeDefinition) *blockSpec {
 
 func findType(token string, fm FunctionMap) (string, TypeDefinition) {
 	if fd := fm.GetFunction(token); fd != nil {
-		if tfd, ok := fd.(FuncTypeDefinition); ok && tfd.IsFunc() {
-			if tfd.IsDefinition() {
-				return tfd.FuncName() + "()", tfd.ReturnType()
-			}
-			return token, tfd.ReturnType()
-		} else {
-			return token, fd.ReturnType()
-		}
+		return token, fd
 	} else {
 		return findPrimType(token)
 	}
@@ -47,24 +40,32 @@ func findPrimType(token string) (string, TypeDefinition) {
 	}
 
 	if suffix2 == "ub" {
-		return token2, NewPrimTypeDefinition("uint8")
+		return token2, safelyParseType("uint8")
 	} else if suffix1 == "b" {
-		return token1, NewPrimTypeDefinition("int8")
+		return token1, safelyParseType("int8")
 	} else if suffix2 == "uh" {
-		return token2, NewPrimTypeDefinition("uint16")
+		return token2, safelyParseType("uint16")
 	} else if suffix1 == "h" {
-		return token1, NewPrimTypeDefinition("int16")
+		return token1, safelyParseType("int16")
 	} else if suffix2 == "ui" {
-		return token2, NewPrimTypeDefinition("uint32")
+		return token2, safelyParseType("uint32")
 	} else if suffix2 == "ul" {
-		return token2, NewPrimTypeDefinition("uint64")
+		return token2, safelyParseType("uint64")
 	} else if suffix1 == "l" {
-		return token1, NewPrimTypeDefinition("int64")
+		return token1, safelyParseType("int64")
 	} else if suffix1 == "f" {
-		return token1, NewPrimTypeDefinition("float32")
+		return token1, safelyParseType("float32")
 	} else if len(suffix2) > 0 && suffix2[0] == '.' {
-		return token, NewPrimTypeDefinition("float64")
+		return token, safelyParseType("float64")
 	} else {
-		return token, NewPrimTypeDefinition("int32")
+		return token, safelyParseType("int32")
 	}
+}
+
+func safelyParseType(s string) TypeDefinition {
+	t, err, _ := ParseTypeDef(s)
+	if err != nil {
+		panic(err.Error())
+	}
+	return t
 }

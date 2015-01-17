@@ -13,13 +13,8 @@ func toRpn(line string, outputQueue []rpnValue, opStack []rpnValue, fm FunctionM
 		return toRpn(rest, outputQueue, append(opStack, newParenRpnValue()), fm)
 	} else if token == ")" {
 		return toRpnRightParen(token, rest, outputQueue, opStack, fm)
-	} else if fd := fm.GetFunction(token); fd != nil && fd.IsFunc() {
-		ftd := fd.(FuncTypeDefinition)
-		if ftd.IsDefinition() {
-			return toRpn(rest, append(outputQueue, newPrimRpnValue(token)), opStack, fm)
-		} else {
-			return toRpn(rest, outputQueue, append(opStack, newOpRpnValue(token, FuncCall)), fm)
-		}
+	} else if _, ok := getFunction(token, fm); ok {
+		return toRpn(rest, outputQueue, append(opStack, newOpRpnValue(token, FuncCall)), fm)
 	} else if parser.IsPrimitive(token) || parser.ValidFunctionName(token) {
 		return toRpn(rest, append(outputQueue, newPrimRpnValue(token)), opStack, fm)
 	} else if token == "" {

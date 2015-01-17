@@ -11,7 +11,7 @@ import (
 var lambdaRegex *regexp.Regexp
 
 func init() {
-	lambdaRegex = regexp.MustCompile("func\\s+(?P<typeDef>(\\s*[a-zA-Z]\\w*\\s+[a-zA-Z]\\w*\\s*->)+(\\s*[a-zA-Z]\\w*\\s*->))\\s*(?P<rest>[\\w\\W]*)")
+	lambdaRegex = regexp.MustCompile("func\\s+(?P<typeDef>(\\s*[a-zA-Z]\\w*\\s+[a-zA-Z]\\w*\\s*->)+(\\s*[a-zA-Z]\\w*\\s*))\\s*(->(?P<rest>[\\w\\W]*))?")
 }
 
 type LambdaStatement struct {
@@ -46,8 +46,14 @@ func newLambdaStatement(lineNum int, typeDef expressionParsing.FuncTypeDefinitio
 func (fs LambdaStatement) Parse(block string, lineNum int, nextBlockScanner *parser.ScanPeeker, factory *StatementFactory) (Statement, parser.SyntaxError) {
 	lines := parser.Lines(block)
 	factory = fetchNewFactory(factory)
-	typeDefStr, rest, ok := fetchParts(lines[0])
-	if !ok {
+	typeDef, err, rest := expressionParsing.ParseTypeDef(lines[0])
+	if err != nil {
+		return nil, parser.NewSyntaxError(err.Error(), lineNum, 0)
+	}
+
+	var ftd expressionParsing.FuncTypeDefinition
+	var ok bool
+	if ftd, ok = typeDef.(expressionParsing.FuncTypeDefinition); !ok {
 		return nil, nil
 	}
 
@@ -61,22 +67,17 @@ func (fs LambdaStatement) Parse(block string, lineNum int, nextBlockScanner *par
 		codeBlock = parser.RemoveTabs(lines[1:])
 	}
 
-	typeDef, err := expressionParsing.ParseFuncTypeDefinition(typeDefStr)
-	if err != nil {
-		return nil, err
+	innerStatements, synErr := fetchInnerStatements(codeBlock, factory, lineNum+1)
+	if synErr != nil {
+		return nil, synErr
 	}
 
-	innerStatements, err := fetchInnerStatements(codeBlock, factory, lineNum+1)
-	if err != nil {
-		return nil, err
+	synErr = verifyInnerStatements(innerStatements, lineNum)
+	if synErr != nil {
+		return nil, synErr
 	}
 
-	err = verifyInnerStatements(innerStatements, lineNum)
-	if err != nil {
-		return nil, err
-	}
-
-	return newLambdaStatement(lineNum, typeDef, innerStatements, fs.packageLevel, fs.name), nil
+	return newLambdaStatement(lineNum, ftd, innerStatements, fs.packageLevel, fs.name), nil
 }
 
 func fetchNewFactory(factory *StatementFactory) *StatementFactory {
@@ -145,7 +146,6 @@ func fetchParts(code string) (string, string, bool) {
 }
 
 func (fs *LambdaStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, parser.SyntaxError) {
-	//fm.AddFunction(fs.FuncName, fs.TypeDef)
 	innerScope := fm.NextScopeLayer()
 	setupFuncMap(innerScope, fs.TypeDef.(expressionParsing.FuncTypeDefinition))
 	inner, err := generateInnerGo(innerScope, fs.InnerStatements)
@@ -158,7 +158,7 @@ func (fs *LambdaStatement) GenerateGo(fm expressionParsing.FunctionMap) (string,
 		funcName = fs.name + " "
 	}
 
-	return fmt.Sprintf("func %s%s{\n\t%s\n}", funcName, generateTypeDef(true, fs.TypeDef), generateInnerFunc(fs.TypeDef, 1, inner)), fs.TypeDef, nil
+	return fmt.Sprintf("func %s%s{\n\t%s\n}", funcName, generateTypeDef(true, fs.TypeDef), generateInnerFunc(getReturnType(fs.TypeDef), 1, inner)), fs.TypeDef, nil
 }
 
 func (fs *LambdaStatement) LineNumber() int {
@@ -182,8 +182,7 @@ func setupFuncMap(fm expressionParsing.FunctionMap, typeDef expressionParsing.Fu
 	if ft, ok := typeDef.ReturnType().(expressionParsing.FuncTypeDefinition); ok {
 		setupFuncMap(fm, ft)
 	}
-	newFt := expressionParsing.NewPrimTypeDefinition(typeDef.Argument().Name())
-	fm.AddFunction(typeDef.ArgumentName(), newFt)
+	fm.AddFunction(typeDef.ArgumentName(), typeDef.ArgumentType())
 }
 
 func generateInnerFunc(typeDef expressionParsing.TypeDefinition, tabCount int, innerStatements []string) string {
@@ -193,23 +192,31 @@ func generateInnerFunc(typeDef expressionParsing.TypeDefinition, tabCount int, i
 	}
 	tabs2 := string(tabs[:len(tabs)-1])
 
-	if !typeDef.ReturnType().IsFunc() {
+	if _, ok := typeDef.(expressionParsing.FuncTypeDefinition); !ok {
 		lenInner := len(innerStatements) - 1
 		innerCode := parser.FromLines(innerStatements[:lenInner])
 		return fmt.Sprintf("%s\n%sreturn %s", innerCode, tabs2, innerStatements[lenInner])
 	}
 
-	return fmt.Sprintf("return %s {\n%s%s\n%s}", generateTypeDef(false, typeDef.ReturnType()), tabs, generateInnerFunc(typeDef.ReturnType(), tabCount+1, innerStatements), tabs2)
+	return fmt.Sprintf("return %s {\n%s%s\n%s}", generateTypeDef(false, typeDef), tabs, generateInnerFunc(getReturnType(typeDef), tabCount+1, innerStatements), tabs2)
+}
+
+func getReturnType(typeDef expressionParsing.TypeDefinition) expressionParsing.TypeDefinition {
+	if ft, ok := typeDef.(expressionParsing.FuncTypeDefinition); ok {
+		return ft.ReturnType()
+	}
+
+	return typeDef
 }
 
 func generateTypeDef(first bool, typeDef expressionParsing.TypeDefinition) string {
 	if ftd, ok := typeDef.(expressionParsing.FuncTypeDefinition); ok {
-		s := fmt.Sprintf("(%s %s) %s", ftd.ArgumentName(), ftd.Argument().Name(), generateTypeDef(false, ftd.ReturnType()))
+		s := fmt.Sprintf("(%s %s) %s", ftd.ArgumentName(), ftd.ArgumentType().GenerateGo(), generateTypeDef(false, ftd.ReturnType()))
 		if !first {
 			return "func " + s
 		}
 		return s
 	} else {
-		return string(typeDef.Name())
+		return string(typeDef.GenerateGo())
 	}
 }

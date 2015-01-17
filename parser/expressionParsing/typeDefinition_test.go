@@ -8,27 +8,48 @@ import (
 )
 
 var _ = Describe("TypeDefinition", func() {
-	Context("Function Definition", func() {
-		It("Should list arguments and return type", func() {
-			i := NewPrimTypeDefinition("int32")
-			u := NewPrimTypeDefinition("uint32")
-			f := NewFuncTypeDefinition("a", i, u)
-			Expect(f.Name()).To(BeEquivalentTo("a int32->uint32"))
-		})
-	})
-	Context("ParseFuncTypeDefinition", func() {
-		It("Should return a chained FuncTypeDefinition", func() {
-			code := "n int32 -> m int32 -> int32 ->"
-			fd, err := ParseFuncTypeDefinition(code)
+	Context("Parse and GenerateGo", func() {
+		It("Should return a primitive type", func() {
+			code := "int32"
+			t, err, _ := ParseTypeDef(code)
 			Expect(err).To(BeNil())
-			Expect(fd).ToNot(BeNil())
-			Expect(fd.Argument().Name()).To(BeEquivalentTo("int32"))
-			Expect(fd.ArgumentName()).To(Equal("n"))
-			f2 := fd.ReturnType().(FuncTypeDefinition)
-			Expect(f2.Argument().Name()).To(BeEquivalentTo("int32"))
-			Expect(f2.ArgumentName()).To(Equal("m"))
-			Expect(f2.ReturnType().Name()).To(BeEquivalentTo("int32"))
-			Expect(fd.GenGo()).To(Equal("func(n int32) func(m int32) int32"))
+			Expect(t.GenerateGo()).To(Equal("int32"))
+		})
+		It("Should return a simple function type", func() {
+			code := "func a int32 -> int32"
+			t, err, _ := ParseTypeDef(code)
+			Expect(err).To(BeNil())
+			Expect(t.GenerateGo()).To(Equal("func (a int32) int32"))
+		})
+		It("Should return a function type with a function as an argument", func() {
+			code := "func a func x int32 -> int32 -> int32"
+			t, err, _ := ParseTypeDef(code)
+			Expect(err).To(BeNil())
+			Expect(t.GenerateGo()).To(Equal("func (a func (x int32) int32) int32"))
+		})
+		It("Should return a curried function type", func() {
+			code := "func a int32 -> b int32 -> int32"
+			t, err, _ := ParseTypeDef(code)
+			Expect(err).To(BeNil())
+			Expect(t.GenerateGo()).To(Equal("func (a int32) func (b int32) int32"))
+		})
+		It("Should return a curried function type with argument as a function", func() {
+			code := "func a func x int32 -> int32 -> b int32 -> int32"
+			t, err, _ := ParseTypeDef(code)
+			Expect(err).To(BeNil())
+			Expect(t.GenerateGo()).To(Equal("func (a func (x int32) int32) func (b int32) int32"))
+		})
+		It("Should return a curried function type with argument as a function and the stuff after", func() {
+			code := "func a func x int32 -> int32 -> b int32 -> int32 -> a b"
+			t, err, rest := ParseTypeDef(code)
+			Expect(err).To(BeNil())
+			Expect(t.GenerateGo()).To(Equal("func (a func (x int32) int32) func (b int32) int32"))
+			Expect(rest).To(Equal("-> a b"))
+		})
+		It("Should return an error", func() {
+			code := "func (a func (x int32) int32) func (b B) int32"
+			_, err, _ := ParseTypeDef(code)
+			Expect(err).ToNot(BeNil())
 		})
 	})
 })
