@@ -185,7 +185,13 @@ func setupFuncMap(fm expressionParsing.FunctionMap, typeDef expressionParsing.Fu
 	if ft, ok := typeDef.ReturnType().(expressionParsing.FuncTypeDefinition); ok {
 		setupFuncMap(fm, ft)
 	}
-	fm.AddFunction(typeDef.ArgumentName(), typeDef.ArgumentType())
+	var argType expressionParsing.TypeDefinition
+	if ptd, ok := typeDef.ArgumentType().(expressionParsing.PrimTypeDefinition); ok {
+		argType = expressionParsing.NewArgTypeDefinition(ptd)
+	} else {
+		argType = typeDef.ArgumentType()
+	}
+	fm.AddFunction(typeDef.ArgumentName(), argType)
 }
 
 func generateInnerFunc(typeDef expressionParsing.TypeDefinition, tabCount int, innerStatements []string) string {

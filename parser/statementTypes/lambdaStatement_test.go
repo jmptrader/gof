@@ -77,7 +77,7 @@ var _ = Describe("LambdaStatement", func() {
 			Expect(err).To(BeNil())
 			code, _, err = f.GenerateGo(fm)
 			Expect(err).To(BeNil())
-			Expect(matchCode(code, "func (a int32) func (b int32) func (c int32) int32{\n\treturn func (b int32) func (c int32) int32 {\n\t\treturn func (c int32) int32 {\n\t\t\t\n\t\t\treturn ((a()+b())+c())\n\t\t}\n\t}\n}")).To(BeTrue())
+			Expect(matchCode(code, "func (a int32) func (b int32) func (c int32) int32{\n\treturn func (b int32) func (c int32) int32 {\n\t\treturn func (c int32) int32 {\n\t\t\t\n\t\t\treturn ((a+b)+c)\n\t\t}\n\t}\n}")).To(BeTrue())
 		})
 		It("Should generate a proper Go package function with one inner statement", func() {
 			fm := expressionParsing.NewFunctionMap()
@@ -91,7 +91,7 @@ var _ = Describe("LambdaStatement", func() {
 			Expect(err).To(BeNil())
 			code, _, err = f.GenerateGo(fm)
 			Expect(err).To(BeNil())
-			Expect(matchCode(code, "func add (a int32) func (b int32) func (c int32) int32{\n\treturn func (b int32) func (c int32) int32 {\n\t\treturn func (c int32) int32 {\n\t\t\t\n\t\t\tvar x func(z int32) int32\nx = func (z int32) int32{\nreturn (z()+1)\n}\nreturn ((a()+b())+x(c()))\n\t\t}\n\t}\n}")).To(BeTrue())
+			Expect(matchCode(code, "func add (a int32) func (b int32) func (c int32) int32{\n\treturn func (b int32) func (c int32) int32 {\n\t\treturn func (c int32) int32 {\n\t\t\t\n\t\t\tvar x func(z int32) int32\nx = func (z int32) int32{\nreturn (z+1)\n}\nreturn ((a+b)+x(c))\n\t\t}\n\t}\n}")).To(BeTrue())
 		})
 		It("Should generate a proper Go function with multiple inner statements", func() {
 			fm := expressionParsing.NewFunctionMap()
@@ -101,7 +101,7 @@ var _ = Describe("LambdaStatement", func() {
 			Expect(err).To(BeNil())
 			code, _, err = f.GenerateGo(fm)
 			Expect(err).To(BeNil())
-			Expect(matchCode(code, "func (a int32) func (b int32) func (c int32) int32{\n\treturn func (b int32) func (c int32) int32 {\n\t\treturn func (c int32) int32 {\n\t\t\t\n\t\t\tvar d func() int32\nd = func(){return 6}return (((a()+b())+c())+d())\n\t\t}\n\t}\n}")).To(BeTrue())
+			Expect(matchCode(code, "func (a int32) func (b int32) func (c int32) int32{\n\treturn func (b int32) func (c int32) int32 {\n\t\treturn func (c int32) int32 {\n\t\t\t\n\t\t\tvar d func() int32\nd = func(){return 6}return (((a+b)+c)+d())\n\t\t}\n\t}\n}")).To(BeTrue())
 		})
 	})
 	Context("Proper statement structure", func() {
