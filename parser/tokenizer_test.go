@@ -112,4 +112,22 @@ var _ = Describe("Parser", func() {
 			Expect(IsOperator(y)).To(BeFalse())
 		})
 	})
+
+	Context("SplitWhitespace", func() {
+		It("Should return the number of words given by n", func() {
+			line := "hello world\thow are you"
+			words := SplitWhitespace(line, 3)
+			Expect(words).To(HaveLen(3))
+			Expect(words).To(Equal([]string{"hello", "world", "how are you"}))
+		})
+	})
+
+	Context("GetFirstToken", func() {
+		It("Should return the first word and then the rest of the line", func() {
+			line := "hello world\thow are you"
+			first, rest := GetFirstToken(line)
+			Expect(first).To(Equal("hello"))
+			Expect(rest).To(Equal("world\thow are you"))
+		})
+	})
 })

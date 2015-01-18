@@ -10,6 +10,7 @@ var regToken *regexp.Regexp
 var regNum *regexp.Regexp
 var regFunc *regexp.Regexp
 var regOps *regexp.Regexp
+var whiteSpaceRegexp *regexp.Regexp
 var ops []string = []string{"+", "-", "*", "/"}
 
 func init() {
@@ -17,6 +18,7 @@ func init() {
 	regNum = regexp.MustCompile("^(0x)?[0-9]+((u?[bhl])|(ui)|f|(\\.[0-9]+f?))?$")
 	regFunc = regexp.MustCompile("^[a-zA-Z][a-zA-z0-9]*$")
 	regOps = regexp.MustCompile("^" + buildOpsPattern(ops) + "$")
+	whiteSpaceRegexp = regexp.MustCompile("\\s+")
 }
 
 func Tokenize(line string) (string, string) {
@@ -87,4 +89,16 @@ func buildOpsPattern(ops []string) string {
 		result = result + "\\" + o
 	}
 	return result + "]"
+}
+
+func SplitWhitespace(line string, n int) []string {
+	return whiteSpaceRegexp.Split(line, n)
+}
+
+func GetFirstToken(line string) (string, string) {
+	broken := SplitWhitespace(line, 2)
+	if len(broken) == 2 {
+		return broken[0], broken[1]
+	}
+	return line, ""
 }
