@@ -4,58 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/apoydence/gof/parser"
-	"regexp"
 )
-
-var whiteSpaceRegexp *regexp.Regexp = regexp.MustCompile("\\s+")
 
 type TypeDefinition interface {
 	GenerateGo() string
-}
-
-type FuncTypeDefinition struct {
-	argName string
-	argType TypeDefinition
-	retType TypeDefinition
-	code    string
-}
-
-type PrimTypeDefinition struct {
-	name string
-}
-
-func (pd PrimTypeDefinition) GenerateGo() string {
-	return pd.name
-}
-
-func (pd PrimTypeDefinition) String() string {
-	return pd.name
-}
-
-func (fd FuncTypeDefinition) GenerateGo() string {
-	return fmt.Sprintf("func (%s %s) %s", fd.argName, fd.argType.GenerateGo(), fd.retType.GenerateGo())
-}
-
-func (fd FuncTypeDefinition) String() string {
-	return fd.code
-}
-
-func (fd FuncTypeDefinition) ReturnType() TypeDefinition {
-	return fd.retType
-}
-
-func (fd FuncTypeDefinition) ArgumentType() TypeDefinition {
-	return fd.argType
-}
-
-func (fd FuncTypeDefinition) ArgumentName() string {
-	return fd.argName
-}
-
-func newPrimTypeDefinition(name string) PrimTypeDefinition {
-	return PrimTypeDefinition{
-		name: name,
-	}
 }
 
 func newFuncTypeDefinition(argName string, argType, retType TypeDefinition) FuncTypeDefinition {
@@ -66,12 +18,16 @@ func newFuncTypeDefinition(argName string, argType, retType TypeDefinition) Func
 	}
 }
 
+func TypeDefEquals(a, b TypeDefinition) bool {
+	return a.GenerateGo() == b.GenerateGo()
+}
+
 func ParseTypeDef(code string) (TypeDefinition, error, string) {
-	first, rest := getFirstToken(code)
-	_, rest2 := getFirstToken(rest)
-	third, _ := getFirstToken(rest2)
+	first, rest := parser.GetFirstToken(code)
+	_, rest2 := parser.GetFirstToken(rest)
+	third, _ := parser.GetFirstToken(rest2)
 	if first == "func" {
-		argName, rest := getFirstToken(rest)
+		argName, rest := parser.GetFirstToken(rest)
 
 		if !parser.ValidFunctionName(argName) {
 			return nil, errors.New(fmt.Sprintf("%s is not a valid argument name.", argName)), ""
@@ -93,20 +49,8 @@ func ParseTypeDef(code string) (TypeDefinition, error, string) {
 	return newPrimTypeDefinition(first), nil, rest
 }
 
-func splitWhitespace(line string, n int) []string {
-	return whiteSpaceRegexp.Split(line, n)
-}
-
-func getFirstToken(line string) (string, string) {
-	broken := splitWhitespace(line, 2)
-	if len(broken) == 2 {
-		return broken[0], broken[1]
-	}
-	return line, ""
-}
-
 func getRetType(code string) (TypeDefinition, error, string) {
-	first, rest := getFirstToken(code)
+	first, rest := parser.GetFirstToken(code)
 	if first == "->" {
 		return ParseTypeDef(rest)
 	}

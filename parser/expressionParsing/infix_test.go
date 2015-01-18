@@ -39,5 +39,15 @@ var _ = Describe("Infix", func() {
 			Expect(td.GenerateGo()).To(Equal("int32"))
 			Expect(code).To(Equal("((5+6)/a(7)(8))"))
 		})
+		It("Should use a argument as a normal value", func() {
+			rpn := []string{"5", "6", "+", "a", "/"}
+			fm := NewFunctionMap()
+			intType, _, _ := ParseTypeDef("int32")
+			fm.AddFunction("a", NewArgTypeDefinition(intType.(PrimTypeDefinition)))
+			code, td, err := ToInfix(rpn, fm)
+			Expect(err).To(BeNil())
+			Expect(td.GenerateGo()).To(Equal("int32"))
+			Expect(code).To(Equal("((5+6)/a)"))
+		})
 	})
 })

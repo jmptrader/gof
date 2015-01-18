@@ -30,10 +30,15 @@ func toInfix(opQueue []*blockSpec, fm FunctionMap, index int) (string, TypeDefin
 		op := newBlockSpec(combined, value)
 		return toInfix(append(opQueue[:index-2], combine(op, opQueue[index+1:])...), fm, index-2)
 	} else if td := fm.GetFunction(opQueue[index].block); td != nil {
+		var bs *blockSpec
 		if _, ok := td.(FuncTypeDefinition); ok {
 			panic("This block should NOT be a function. A previous if should have grabbed it")
+		} else if _, ok := td.(ArgumentTypeDefinition); ok {
+			bs = newBlockSpec(opQueue[index].block, td)
+		} else {
+			bs = newBlockSpec(fmt.Sprintf("%s()", opQueue[index].block), td)
 		}
-		opQueue[index] = newBlockSpec(fmt.Sprintf("%s()", opQueue[index].block), td)
+		opQueue[index] = bs
 		return toInfix(opQueue, fm, index+1)
 	} else {
 		return toInfix(opQueue, fm, index+1)
@@ -77,7 +82,7 @@ func getValueType(ops []*blockSpec) (TypeDefinition, error) {
 	left := ops[0]
 	right := ops[1]
 
-	if left.valueType != right.valueType {
+	if !TypeDefEquals(left.valueType, right.valueType) {
 		return nil, errors.New(fmt.Sprintf("Illegal to %s%s%s", left.block, ops[2].block, right.block))
 	}
 
