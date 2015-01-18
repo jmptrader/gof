@@ -83,6 +83,22 @@ func (fs LambdaStatement) Parse(block string, lineNum int, nextBlockScanner *par
 	return newLambdaStatement(lineNum, ftd, innerStatements, fs.packageLevel, fs.name), nil
 }
 
+func (fs *LambdaStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, parser.SyntaxError) {
+	innerScope := fm.NextScopeLayer()
+	setupFuncMap(innerScope, fs.TypeDef.(expressionParsing.FuncTypeDefinition))
+	inner, err := generateInnerGo(innerScope, fs.InnerStatements)
+	if err != nil {
+		return "", nil, err
+	}
+
+	var funcName string = ""
+	if fs.packageLevel {
+		funcName = fs.name + " "
+	}
+
+	return fmt.Sprintf("func %s%s{\n\t%s\n}", funcName, generateTypeDef(true, fs.TypeDef), generateInnerFunc(getReturnType(fs.TypeDef), 1, inner)), fs.TypeDef, nil
+}
+
 func fetchNewFactory(factory *StatementFactory) *StatementFactory {
 	sps := make([]StatementParser, 0)
 	for _, s := range factory.statements {
@@ -146,22 +162,6 @@ func fetchParts(code string) (string, string, bool) {
 	}
 
 	return match[groupIndex["typeDef"]], match[groupIndex["rest"]], true
-}
-
-func (fs *LambdaStatement) GenerateGo(fm expressionParsing.FunctionMap) (string, expressionParsing.TypeDefinition, parser.SyntaxError) {
-	innerScope := fm.NextScopeLayer()
-	setupFuncMap(innerScope, fs.TypeDef.(expressionParsing.FuncTypeDefinition))
-	inner, err := generateInnerGo(innerScope, fs.InnerStatements)
-	if err != nil {
-		return "", nil, err
-	}
-
-	var funcName string = ""
-	if fs.packageLevel {
-		funcName = fs.name + " "
-	}
-
-	return fmt.Sprintf("func %s%s{\n\t%s\n}", funcName, generateTypeDef(true, fs.TypeDef), generateInnerFunc(getReturnType(fs.TypeDef), 1, inner)), fs.TypeDef, nil
 }
 
 func (fs *LambdaStatement) LineNumber() int {
