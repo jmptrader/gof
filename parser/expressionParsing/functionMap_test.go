@@ -15,7 +15,7 @@ var _ = Describe("FunctionMap", func() {
 			intType, _, _ = ParseTypeDef("int32")
 			funcType, _, _ = ParseTypeDef("func x int32 -> int32")
 		})
-		It("Should return incrementing values", func() {
+		It("Should return same name", func() {
 			fm := NewFunctionMap()
 			a, err := fm.AddFunction("a", funcType)
 			Expect(err).To(BeNil())
