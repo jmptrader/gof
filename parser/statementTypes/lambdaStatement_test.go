@@ -59,6 +59,16 @@ var _ = Describe("LambdaStatement", func() {
 		})
 	})
 	Context("GenerateGo", func() {
+		It("Should generate a proper Go function with single line statement", func() {
+			fm := expressionParsing.NewFunctionMap()
+			code := "func a int32 -> int32 -> a + 5"
+			f, err := statementParser.Parse(code, 0, nil, factory)
+			Expect(f).ToNot(BeNil())
+			Expect(err).To(BeNil())
+			code, _, err = f.GenerateGo(fm)
+			Expect(err).To(BeNil())
+			Expect(matchCode(code, "func (a int32) int32{return (a+5)}")).To(BeTrue())
+		})
 		It("Should generate a proper Go function with one inner statement", func() {
 			fm := expressionParsing.NewFunctionMap()
 			code := "func a int32 -> b int32 -> c int32 -> int32\n\ta + b + c"
