@@ -5,6 +5,7 @@ import "github.com/apoydence/gof/parser"
 type FunctionMap interface {
 	GetFunction(name string) TypeDefinition
 	AddFunction(name string, f TypeDefinition) (string, error)
+	AdjustFunction(name string, f TypeDefinition) error
 	NextScopeLayer() FunctionMap
 }
 
