@@ -21,7 +21,6 @@ func toRpn(line string, outputQueue []RpnValue, opStack []RpnValue, fm FunctionM
 		for i := len(opStack) - 1; i > -1; i-- {
 			outputQueue = append(outputQueue, opStack[i])
 		}
-		//return rpnToString(outputQueue), nil
 		return outputQueue, nil
 	}
 
