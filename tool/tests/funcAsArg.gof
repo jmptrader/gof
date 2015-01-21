@@ -1,0 +1,6 @@
+let usedAsArg = func a int32 -> b int32 -> int32 -> a * b
+
+let FuncAsArg = func a int32 -> b int32 -> int32
+	let inner = func x func aa int32 -> bb int32 -> int32 -> y int32 -> int32
+		x a b + y
+	inner usedAsArg 10
