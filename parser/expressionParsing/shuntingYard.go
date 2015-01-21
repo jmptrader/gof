@@ -14,9 +14,9 @@ func toRpn(line string, outputQueue []RpnValue, opStack []RpnValue, fm FunctionM
 	} else if token == ")" {
 		return toRpnRightParen(token, rest, outputQueue, opStack, fm)
 	} else if _, ok := getFunction(token, fm); ok && !topOfStackIsFunc(opStack, fm) {
-		return toRpn(rest, outputQueue, append(opStack, NewOpRpnValue(token, FuncCall)), fm)
+		return toRpn(rest, outputQueue, append(opStack, newOpRpnValue(token, FuncCall)), fm)
 	} else if parser.IsPrimitive(token) || parser.ValidFunctionName(token) {
-		return toRpn(rest, append(outputQueue, NewPrimRpnValue(token)), opStack, fm)
+		return toRpn(rest, append(outputQueue, newPrimRpnValue(token)), opStack, fm)
 	} else if token == "" {
 		for i := len(opStack) - 1; i > -1; i-- {
 			outputQueue = append(outputQueue, opStack[i])
@@ -39,11 +39,11 @@ func topOfStackIsFunc(opStack []RpnValue, fm FunctionMap) bool {
 }
 
 func toRpnOperator(token, rest string, outputQueue []RpnValue, opStack []RpnValue, fm FunctionMap) ([]RpnValue, error) {
-	prec := OpPrec(token)
-	op := NewOpRpnValue(token, prec)
+	prec := opPrec(token)
+	op := newOpRpnValue(token, prec)
 	if len(opStack) > 0 {
 		stackTop := opStack[len(opStack)-1]
-		if stackTop.Operator && prec <= stackTop.prec {
+		if stackTop.operator && prec <= stackTop.prec {
 			opStack[len(opStack)-1] = op
 			return toRpnOperator(token, rest, append(outputQueue, stackTop), opStack[:len(opStack)-1], fm)
 		} else {
@@ -66,7 +66,7 @@ func rpnToString(ops []RpnValue) []string {
 	result := make([]string, 0)
 	for _, o := range ops {
 		prefix := ""
-		if o.Argument {
+		if o.argument {
 			prefix = "a:"
 		}
 		result = append(result, prefix+o.token)
@@ -75,7 +75,7 @@ func rpnToString(ops []RpnValue) []string {
 	return result
 }
 
-func OpPrec(op string) int {
+func opPrec(op string) int {
 	if op == "+" || op == "-" {
 		return AddSub
 	} else if op == "*" || op == "/" {

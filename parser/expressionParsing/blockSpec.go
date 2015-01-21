@@ -10,7 +10,7 @@ func toBlockSpec(opQueue []RpnValue, fm FunctionMap) []*blockSpec {
 	result := make([]*blockSpec, 0)
 	for _, o := range opQueue {
 		bs := newBlockSpec(findType(o, fm))
-		bs.isArg = o.Argument
+		bs.isArg = o.argument
 		result = append(result, bs)
 	}
 
