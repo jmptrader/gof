@@ -11,11 +11,13 @@ import (
 
 var _ = Describe("ReturnStatement", func() {
 	var statementParser StatementParser
+	var lambdaParser StatementParser
 	var factory *StatementFactory
 
 	BeforeEach(func() {
 		statementParser = NewReturnStatementParser()
-		factory = NewStatementFactory(statementParser)
+		lambdaParser = NewLambdaStatementParser()
+		factory = NewStatementFactory(lambdaParser, statementParser)
 	})
 	Context("Parse", func() {
 
@@ -141,6 +143,19 @@ var _ = Describe("ReturnStatement", func() {
 				_, _, err = r.GenerateGo(fm)
 				Expect(err).ToNot(BeNil())
 				Expect(err.Line()).To(Equal(9))
+			})
+		})
+		Context("With inner statements", func() {
+			It("Should extract an inner lambda and save as a function", func() {
+				code := "a ( func x int32 -> int32 -> x + 10 ) ( 5 + 9 )"
+				fm := expressionParsing.NewFunctionMap()
+				funcType, _, _ := expressionParsing.ParseTypeDef("func x func xx int32 -> int32 -> y int32 -> int32")
+				fm.AddFunction("a", funcType)
+				r, err := statementParser.Parse(code, 9, nil, factory)
+				Expect(err).To(BeNil())
+				code, _, err = r.GenerateGo(fm)
+				Expect(err).To(BeNil())
+				Expect(matchCode(code, "a(func(x int32)int32{return (x+10)})((5+9))")).To(BeTrue())
 			})
 		})
 	})

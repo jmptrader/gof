@@ -14,4 +14,10 @@ var _ = Describe("TwoFunc", func() {
 			Expect(Action(3)(4)(5)).To(BeEquivalentTo(24))
 		})
 	})
+	Context("Action2", func() {
+		It("Should add argument to 9", func() {
+			Expect(Action2(7)).To(BeEquivalentTo(16))
+			Expect(Action2(10)).To(BeEquivalentTo(19))
+		})
+	})
 })

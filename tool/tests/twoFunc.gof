@@ -4,3 +4,9 @@ let mult = func a int32 -> b int32 -> int32
 let Action = func a int32 -> b int32 -> c int32 -> int32
 	let x = func y int32 -> int32 -> y + a
 	mult a b + c + x b
+
+let inlineTest = func a func x int32 -> int32 -> int32 -> a 9
+
+let Action2 = func a int32 -> int32
+	inlineTest (func x int32 -> int32 -> a + x)
+
