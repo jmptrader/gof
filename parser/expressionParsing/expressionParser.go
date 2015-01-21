@@ -6,6 +6,7 @@ type FunctionMap interface {
 	GetFunction(name string) TypeDefinition
 	AddFunction(name string, f TypeDefinition) (string, error)
 	NextScopeLayer() FunctionMap
+	NumberOfFunctions() int
 }
 
 func ToRpn(line string, lineNum int, fm FunctionMap) ([]RpnValue, parser.SyntaxError) {

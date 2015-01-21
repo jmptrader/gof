@@ -51,6 +51,13 @@ func (fm *funcMap) NextScopeLayer() FunctionMap {
 	return newFunctionMap(fm)
 }
 
+func (fm *funcMap) NumberOfFunctions() int {
+	if fm.prevScope == nil {
+		return len(fm.fm)
+	}
+	return len(fm.fm) + fm.prevScope.NumberOfFunctions()
+}
+
 func (fm *funcMap) getNextFunctionName() string {
 	goFuncName := "_" + strconv.Itoa(fm.count)
 	fm.count++
