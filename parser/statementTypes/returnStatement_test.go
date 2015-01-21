@@ -109,7 +109,7 @@ var _ = Describe("ReturnStatement", func() {
 				Expect(genGo).To(Equal(fmt.Sprintf("((7+13)-(%s(5)(9)/8))", name)))
 			})
 			It("Should generate the proper Go code with multiple functions", func() {
-				code := "( 7 + 13 ) - a 5 b 9 / 8"
+				code := "( 7 + 13 ) - a 5 ( b 9 ) / 8"
 				r, err := statementParser.Parse(code, 0, nil, factory)
 				Expect(err).To(BeNil())
 				fm := expressionParsing.NewFunctionMap()

@@ -46,15 +46,6 @@ func (fm *funcMap) AddFunction(name string, f TypeDefinition) (string, error) {
 
 	return name, nil
 }
-func (fm *funcMap) AdjustFunction(name string, f TypeDefinition) error {
-	if _, ok := fm.fm[name]; !ok {
-		return errors.New("Unknown function name: " + name)
-	}
-
-	fm.fm[name] = f
-
-	return nil
-}
 
 func (fm *funcMap) NextScopeLayer() FunctionMap {
 	return newFunctionMap(fm)

@@ -5,12 +5,11 @@ import "github.com/apoydence/gof/parser"
 type FunctionMap interface {
 	GetFunction(name string) TypeDefinition
 	AddFunction(name string, f TypeDefinition) (string, error)
-	AdjustFunction(name string, f TypeDefinition) error
 	NextScopeLayer() FunctionMap
 }
 
-func ToRpn(line string, lineNum int, fm FunctionMap) ([]string, parser.SyntaxError) {
-	rpn, err := toRpn(line, []rpnValue{}, []rpnValue{}, fm)
+func ToRpn(line string, lineNum int, fm FunctionMap) ([]RpnValue, parser.SyntaxError) {
+	rpn, err := toRpn(line, []RpnValue{}, []RpnValue{}, fm)
 	if err != nil {
 		return nil, parser.NewSyntaxError(err.Error(), lineNum, 0)
 	}

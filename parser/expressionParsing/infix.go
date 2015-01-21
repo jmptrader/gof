@@ -6,7 +6,7 @@ import (
 	"github.com/apoydence/gof/parser"
 )
 
-func ToInfix(opQueue []string, fm FunctionMap) (string, TypeDefinition, error) {
+func ToInfix(opQueue []RpnValue, fm FunctionMap) (string, TypeDefinition, error) {
 	return toInfix(toBlockSpec(opQueue, fm), fm, 0)
 }
 
@@ -31,10 +31,10 @@ func toInfix(opQueue []*blockSpec, fm FunctionMap, index int) (string, TypeDefin
 		return toInfix(append(opQueue[:index-2], combine(op, opQueue[index+1:])...), fm, index-2)
 	} else if td := fm.GetFunction(opQueue[index].block); td != nil {
 		var bs *blockSpec
-		if _, ok := td.(FuncTypeDefinition); ok {
+		if getArgument(opQueue[index], td) {
+			bs = opQueue[index]
+		} else if _, ok := td.(FuncTypeDefinition); ok {
 			panic("This block should NOT be a function. A previous if should have grabbed it")
-		} else if _, ok := td.(ArgumentTypeDefinition); ok {
-			bs = newBlockSpec(opQueue[index].block, td)
 		} else {
 			bs = newBlockSpec(fmt.Sprintf("%s()", opQueue[index].block), td)
 		}
@@ -43,6 +43,16 @@ func toInfix(opQueue []*blockSpec, fm FunctionMap, index int) (string, TypeDefin
 	} else {
 		return toInfix(opQueue, fm, index+1)
 	}
+}
+
+func getArgument(block *blockSpec, td TypeDefinition) bool {
+	if _, ok := block.valueType.(ArgumentTypeDefinition); ok {
+		return true
+	} else if _, ok := td.(ArgumentTypeDefinition); ok {
+		return true
+	}
+
+	return false
 }
 
 func getFunction(block string, fm FunctionMap) (FuncTypeDefinition, bool) {
@@ -56,7 +66,9 @@ func getFunction(block string, fm FunctionMap) (FuncTypeDefinition, bool) {
 }
 
 func isFunc(block *blockSpec, fm FunctionMap) (FuncTypeDefinition, bool) {
-	if ftd, ok := block.valueType.(FuncTypeDefinition); ok {
+	if _, ok := block.valueType.(ArgumentTypeDefinition); ok {
+		return FuncTypeDefinition{}, false
+	} else if ftd, ok := block.valueType.(FuncTypeDefinition); ok {
 		return ftd, true
 	} else if ftd, ok := getFunction(block.block, fm); ok {
 		return ftd, true

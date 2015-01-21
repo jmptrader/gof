@@ -1,10 +1,10 @@
 package expressionParsing
 
 type ArgumentTypeDefinition struct {
-	argType PrimTypeDefinition
+	argType TypeDefinition
 }
 
-func NewArgTypeDefinition(argDef PrimTypeDefinition) ArgumentTypeDefinition {
+func NewArgTypeDefinition(argDef TypeDefinition) ArgumentTypeDefinition {
 	return ArgumentTypeDefinition{
 		argType: argDef,
 	}

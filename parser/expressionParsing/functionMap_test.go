@@ -44,13 +44,5 @@ var _ = Describe("FunctionMap", func() {
 			_, err = fm.AddFunction("a", funcType)
 			Expect(err).ToNot(BeNil())
 		})
-		It("Should adjust function definition", func() {
-			fm := NewFunctionMap()
-			_, err := fm.AddFunction("a", funcType)
-			Expect(err).To(BeNil())
-			err = fm.AdjustFunction("a", intType)
-			Expect(err).To(BeNil())
-			Expect(fm.GetFunction("a").GenerateGo()).To(Equal(intType.GenerateGo()))
-		})
 	})
 })

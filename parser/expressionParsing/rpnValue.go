@@ -6,30 +6,36 @@ const (
 	FuncCall
 )
 
-type rpnValue struct {
+type RpnValue struct {
 	prec     int
 	token    string
 	leftPar  bool
-	operator bool
+	Operator bool
+	Argument bool
 }
 
-func newPrimRpnValue(token string) rpnValue {
-	return rpnValue{
-		token: token,
+func NewPrimRpnValue(token string) RpnValue {
+	return RpnValue{
+		token:    token,
+		Argument: true,
 	}
 }
 
-func newParenRpnValue() rpnValue {
-	return rpnValue{
+func newParenRpnValue() RpnValue {
+	return RpnValue{
 		leftPar: true,
 		token:   ")",
 	}
 }
 
-func newOpRpnValue(token string, prec int) rpnValue {
-	return rpnValue{
+func NewOpRpnValue(token string, prec int) RpnValue {
+	return RpnValue{
 		token:    token,
-		operator: true,
+		Operator: true,
 		prec:     prec,
 	}
+}
+
+func (r RpnValue) String() string {
+	return r.token
 }
