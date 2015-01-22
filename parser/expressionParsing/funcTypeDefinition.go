@@ -11,6 +11,14 @@ type FuncTypeDefinition struct {
 	code    string
 }
 
+func newFuncTypeDefinition(argName string, argType, retType TypeDefinition) FuncTypeDefinition {
+	return FuncTypeDefinition{
+		argName: argName,
+		argType: argType,
+		retType: retType,
+	}
+}
+
 func (fd FuncTypeDefinition) GenerateGo() string {
 	return fmt.Sprintf("func (%s %s) %s", fd.argName, fd.argType.GenerateGo(), fd.retType.GenerateGo())
 }

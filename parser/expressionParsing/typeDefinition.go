@@ -10,14 +10,6 @@ type TypeDefinition interface {
 	GenerateGo() string
 }
 
-func newFuncTypeDefinition(argName string, argType, retType TypeDefinition) FuncTypeDefinition {
-	return FuncTypeDefinition{
-		argName: argName,
-		argType: argType,
-		retType: retType,
-	}
-}
-
 func TypeDefEquals(a, b TypeDefinition) bool {
 	return a.GenerateGo() == b.GenerateGo()
 }
