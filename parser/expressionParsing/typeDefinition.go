@@ -23,11 +23,11 @@ func TypeDefEquals(a, b TypeDefinition) bool {
 }
 
 func ParseTypeDef(code string) (TypeDefinition, error, string) {
-	first, rest := parser.GetFirstToken(code)
-	_, rest2 := parser.GetFirstToken(rest)
-	third, _ := parser.GetFirstToken(rest2)
+	first, rest := parser.Tokenize(code)
+	_, rest2 := parser.Tokenize(rest)
+	third, _ := parser.Tokenize(rest2)
 	if first == "func" {
-		argName, rest := parser.GetFirstToken(rest)
+		argName, rest := parser.Tokenize(rest)
 
 		if !parser.ValidFunctionName(argName) {
 			return nil, errors.New(fmt.Sprintf("%s is not a valid argument name.", argName)), ""
@@ -50,7 +50,7 @@ func ParseTypeDef(code string) (TypeDefinition, error, string) {
 }
 
 func getRetType(code string) (TypeDefinition, error, string) {
-	first, rest := parser.GetFirstToken(code)
+	first, rest := parser.Tokenize(code)
 	if first == "->" {
 		return ParseTypeDef(rest)
 	}

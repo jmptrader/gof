@@ -9,7 +9,7 @@ import (
 
 var _ = Describe("Parser", func() {
 	Context("Tokenize", func() {
-		It("Should split up a line based on whitespace", func() {
+		It("Should split up a line based on whitespace and operators", func() {
 			code := "\ta b c"
 			a, rest := Tokenize(code)
 			Expect(a).To(Equal("a"))
@@ -110,24 +110,6 @@ var _ = Describe("Parser", func() {
 			Expect(IsOperator(d)).To(BeTrue())
 			Expect(IsOperator(x)).To(BeFalse())
 			Expect(IsOperator(y)).To(BeFalse())
-		})
-	})
-
-	Context("SplitWhitespace", func() {
-		It("Should return the number of words given by n", func() {
-			line := "hello world\thow are you"
-			words := SplitWhitespace(line, 3)
-			Expect(words).To(HaveLen(3))
-			Expect(words).To(Equal([]string{"hello", "world", "how are you"}))
-		})
-	})
-
-	Context("GetFirstToken", func() {
-		It("Should return the first word and then the rest of the line", func() {
-			line := "hello world\thow are you"
-			first, rest := GetFirstToken(line)
-			Expect(first).To(Equal("hello"))
-			Expect(rest).To(Equal("world\thow are you"))
 		})
 	})
 })
