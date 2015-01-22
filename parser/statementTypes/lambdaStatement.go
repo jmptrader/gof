@@ -62,7 +62,7 @@ func (fs LambdaStatement) Parse(block string, lineNum int, nextBlockScanner *par
 		var first string
 		if len(lines) > 1 {
 			return nil, parser.NewSyntaxError("Inline lambdas can only be one line", lineNum, 0)
-		} else if first, rest = parser.GetFirstToken(rest); first != "->" {
+		} else if first, rest = parser.Tokenize(rest); first != "->" {
 			return nil, parser.NewSyntaxError("Misplaced tokens: "+rest, lineNum, 0)
 		}
 		codeBlock = []string{rest}

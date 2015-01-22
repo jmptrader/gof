@@ -2,6 +2,7 @@ package parser
 
 import (
 	"bufio"
+	"fmt"
 	"regexp"
 	"strings"
 )
@@ -13,21 +14,37 @@ var regOps *regexp.Regexp
 var ops []string = []string{"+", "-", "*", "/"}
 
 func init() {
-	regToken = regexp.MustCompile("\\s")
+	regToken = regexp.MustCompile(buildOpsPattern(append([]string{"s", "-\\>"}, ops...)))
 	regNum = regexp.MustCompile("^(0x)?[0-9]+((u?[bhl])|(ui)|f|(\\.[0-9]+f?))?$")
 	regFunc = regexp.MustCompile("^[a-zA-Z][a-zA-z0-9]*$")
-	regOps = regexp.MustCompile("^" + buildOpsPattern(ops) + "$")
+	regOps = regexp.MustCompile("^(" + buildOpsPattern(ops) + ")$")
 }
 
 func Tokenize(line string) (string, string) {
-	values := regToken.Split(line, 2)
-	if len(values) == 2 {
-		if len(values[0]) == 0 {
-			return Tokenize(values[1])
-		}
-		return values[0], values[1]
+	ok, value, rest := split(line, regToken)
+	if ok {
+		return value, rest
 	}
-	return values[0], ""
+	return line, ""
+}
+
+func split(s string, r *regexp.Regexp) (bool, string, string) {
+	index := r.FindStringIndex(s)
+	if index == nil {
+		return false, "", ""
+	}
+
+	if index[0] == 0 {
+		index[0] = index[1]
+	}
+
+	first := strings.TrimSpace(s[:index[0]])
+	rest := strings.TrimSpace(s[index[0]:])
+	if len(first) > 0 {
+		return true, first, rest
+	} else {
+		return split(rest, r)
+	}
 }
 
 func Lines(block string) []string {
@@ -82,9 +99,9 @@ func IsOperator(value string) bool {
 }
 
 func buildOpsPattern(ops []string) string {
-	result := "["
+	result := ""
 	for _, o := range ops {
-		result = result + "\\" + o
+		result += fmt.Sprintf("(\\%s)|", o)
 	}
-	return result + "]"
+	return result[:len(result)-1]
 }

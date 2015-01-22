@@ -9,11 +9,26 @@ import (
 
 var _ = Describe("Parser", func() {
 	Context("Tokenize", func() {
-		It("Should split up a line based on whitespace and operators", func() {
+		It("Should split up a line based on whitespace", func() {
 			code := "\ta b c"
 			a, rest := Tokenize(code)
 			Expect(a).To(Equal("a"))
 			Expect(rest).To(Equal("b c"))
+		})
+		It("Should split up a line based on whitespace and operators", func() {
+			code := "\ta+b c->d"
+			a, rest := Tokenize(code)
+			plus, rest := Tokenize(rest)
+			b, rest := Tokenize(rest)
+			c, rest := Tokenize(rest)
+			arrow, rest := Tokenize(rest)
+			d, rest := Tokenize(rest)
+			Expect(a).To(Equal("a"))
+			Expect(plus).To(Equal("+"))
+			Expect(b).To(Equal("b"))
+			Expect(c).To(Equal("c"))
+			Expect(arrow).To(Equal("->"))
+			Expect(d).To(Equal("d"))
 		})
 		It("Should return an empty 2nd string when it cant split", func() {
 			code := "abc"
@@ -110,6 +125,10 @@ var _ = Describe("Parser", func() {
 			Expect(IsOperator(d)).To(BeTrue())
 			Expect(IsOperator(x)).To(BeFalse())
 			Expect(IsOperator(y)).To(BeFalse())
+		})
+		It("Should not match a value that only contains an operator", func() {
+			Expect(IsOperator("a+4")).To(BeFalse())
+			Expect(IsOperator("((1+11)-(10/2))")).To(BeFalse())
 		})
 	})
 })
